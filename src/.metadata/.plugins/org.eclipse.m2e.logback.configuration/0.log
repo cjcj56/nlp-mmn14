@@ -1083,3 +1083,11 @@ java.io.FileNotFoundException: /root/.m2/repository/.cache/m2e/1.8.3/05b0fe85248
 2018-05-24 20:07:12,292 [Worker-50] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 3 resources
 2018-05-24 20:07:12,294 [Worker-50] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
 2018-05-24 20:07:12,298 [Worker-50] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /root/hw4/mmn14-parsing-openu/src/Pcfg/src/test/resources
+2018-05-24 20:18:49,594 [Worker-53] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2018-05-24 20:18:49,603 [Worker-53] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
+2018-05-24 20:18:49,617 [Worker-53] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2018-05-24 20:18:49,617 [Worker-53] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /root/hw4/mmn14-parsing-openu/src/Pcfg/src/test/resources
+2018-05-24 20:18:50,724 [Worker-49] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2018-05-24 20:18:50,724 [Worker-49] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
+2018-05-24 20:18:50,738 [Worker-49] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2018-05-24 20:18:50,739 [Worker-49] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /root/hw4/mmn14-parsing-openu/src/Pcfg/src/test/resources
