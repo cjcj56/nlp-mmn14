@@ -30,7 +30,11 @@ public class Grammar {
 	protected Set<Rule> m_setLexicalRules = new HashSet<Rule>();
 	protected CountMap<Rule> m_cmRuleCounts = new CountMap<Rule>();
 	protected Map<String, Set<Rule>> m_lexLexicalEntries = new HashMap<String, Set<Rule>>();
-		
+
+	// aviad
+	protected CountMap<String> m_cmNonTerminalSymbolsCounts = new CountMap<String>();
+
+
 	public Grammar() {
 		super();
 	}
@@ -78,6 +82,10 @@ public class Grammar {
 		
 		// update the rule counts 
 		getRuleCounts().increment(r);
+
+		//aviad
+		getNonTerminalSymbolsCounts().increment(r.getLHS().getSymbols().get(0));
+
 	}
 	
 
@@ -149,6 +157,11 @@ public class Grammar {
 		for (int i = 0; i < theRules.size(); i++) {
 			addRule(theRules.get(i));
 		}
+	}
+
+	//aviad
+	public CountMap<String> getNonTerminalSymbolsCounts() {
+		return m_cmNonTerminalSymbolsCounts;
 	}
 
 }

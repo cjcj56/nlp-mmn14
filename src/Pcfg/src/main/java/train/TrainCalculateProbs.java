@@ -1,13 +1,8 @@
 package train;
 
-import grammar.Event;
 import grammar.Grammar;
-import grammar.ProbabilityGrammar;
 import grammar.Rule;
 
-import java.util.*;
-
-import tree.EnhancedNode;
 import tree.Node;
 import tree.Tree;
 import treebank.Treebank;
@@ -37,7 +32,7 @@ public class TrainCalculateProbs extends Train {
     }
 
     public Grammar train(Treebank myTreebank) {
-        ProbabilityGrammar grammar = new ProbabilityGrammar(super.train(myTreebank));
+        Grammar grammar = super.train(myTreebank);
 
         for (Rule rule : grammar.getLexicalRules()) {
             rule.setMinusLogProb(calculateProbs(grammar.getRuleCounts().get(rule),
@@ -64,21 +59,23 @@ public class TrainCalculateProbs extends Train {
     }
 
     private Node updateNode(Node node) {
-    	EnhancedNode eNode = null;
         if (node.getDaughters().size() > 2) {
-            eNode = new EnhancedNode(node);
-            EnhancedNode newNode = (EnhancedNode) eNode.clone();
+            Node newNode = (Node) node.clone();
             newNode.removeDaughter(newNode.getDaughters().get(0));
             Node secondNode = updateNode(newNode);
 
-//            secondNode.setParent();
-            Node firstNode = eNode.getDaughters().get(0);
-            eNode.cleanDaughters();
-            eNode.addDaughter(firstNode);
-            eNode.addDaughter(secondNode);
+            secondNode.setIdentifier(secondNode.getIdentifier()+"@//");
+            Node firstNode = node.getDaughters().get(0);
+            node.cleanDaughters();
+            node.addDaughter(firstNode);
+            node.addDaughter(secondNode);
         }
-        return eNode != null ? eNode : node;
+        else{
+            for (Node childNode : node.getDaughters()){
+                childNode = updateNode(childNode);
+            }
+        }
+        return node;
     }
-
 
 }

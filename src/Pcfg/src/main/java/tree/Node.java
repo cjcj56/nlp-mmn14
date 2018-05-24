@@ -304,5 +304,10 @@ public class Node {
 	{
 		return getIdentifier();
 	}
-	
+
+// aviad
+	public void cleanDaughters() {
+		getDaughters().clear();
+	}
+
 }

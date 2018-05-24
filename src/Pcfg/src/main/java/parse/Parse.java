@@ -13,6 +13,7 @@ import bracketimport.TreebankReader;
 import decode.Decode;
 import train.Train;
 
+import train.TrainCalculateProbs;
 import tree.Tree;
 import treebank.Treebank;
 
@@ -50,10 +51,10 @@ public class Parse {
 		Treebank myTrainTreebank = TreebankReader.getInstance().read(true, args[1]);
 		
 		// 2. transform trees
-		// TODO
-		
+		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank);
+		writeParseTrees("TrainBinarizing", myTrainTreebank.getAnalyses());
 		// 3. train
-		Grammar myGrammar = Train.getInstance().train(myTrainTreebank);
+		Grammar myGrammar = TrainCalculateProbs.getInstance().train(myTrainTreebank);
 		
 		// 4. decode
 		List<Tree> myParseTrees = new ArrayList<Tree>();		
