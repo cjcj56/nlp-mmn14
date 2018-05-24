@@ -20,4 +20,11 @@
 		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>java</name>
+			<type>2</type>
+			<location>/root/hw4/mmn14-parsing-openu/src/Pcfg/src/main/java</location>
+		</link>
+	</linkedResources>
 </projectDescription>
