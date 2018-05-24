@@ -12,11 +12,11 @@ import utils.CountMap;
  * 
  * @author rtsarfat
  *
- *         CLASS: Grammar
+ * CLASS: Grammar
  * 
- *         Definition: formally <N,T,S,R> Role: holds two collection of
- *         grammatical and lexical grammar rules Responsibility: define a start
- *         symbol
+ * Definition: formally <N,T,S,R> 
+ * Role: holds two collection of grammatical and lexical grammar rules  
+ * Responsibility: define a start symbol 
  * 
  */
 
@@ -30,11 +30,11 @@ public class Grammar {
 	protected Set<Rule> m_setLexicalRules = new HashSet<Rule>();
 	protected CountMap<Rule> m_cmRuleCounts = new CountMap<Rule>();
 	protected Map<String, Set<Rule>> m_lexLexicalEntries = new HashMap<String, Set<Rule>>();
-
+		
 	public Grammar() {
 		super();
 	}
-
+	
 	public Map<String, Set<Rule>> getLexicalEntries() {
 		return m_lexLexicalEntries;
 	}
@@ -47,34 +47,39 @@ public class Grammar {
 		return m_cmRuleCounts;
 	}
 
-	public void addRule(Rule r) {
+	public void addRule(Rule r)
+	{	
 		Event eLhs = r.getLHS();
 		Event eRhs = r.getRHS();
-
-		if (r.isLexical()) {
+				
+		if (r.isLexical())
+		{
 			// update the sets T, N, R
 			getLexicalRules().add(r);
 			getNonTerminalSymbols().addAll(eLhs.getSymbols());
 			getTerminalSymbols().addAll(eRhs.getSymbols());
-
+			
 			// update the dictionary
-			if (!getLexicalEntries().containsKey(eRhs.toString()))
+			if (!getLexicalEntries().containsKey(eRhs.toString()) )
 				getLexicalEntries().put(eRhs.toString(), new HashSet<Rule>());
 			getLexicalEntries().get(eRhs.toString()).add(r);
-		} else {
+		}
+		else 
+		{
 			// update the sets T, N, R
 			getSyntacticRules().add(r);
 			getNonTerminalSymbols().addAll(eLhs.getSymbols());
 			getNonTerminalSymbols().addAll(eRhs.getSymbols());
 		}
-
+		
 		// update the start symbol(s)
 		if (r.isTop())
 			getStartSymbols().add(eLhs.toString());
-
-		// update the rule counts
+		
+		// update the rule counts 
 		getRuleCounts().increment(r);
 	}
+	
 
 	public Set<String> getNonTerminalSymbols() {
 		return m_setNonTerminalSymbols;
@@ -112,22 +117,26 @@ public class Grammar {
 		m_setTerminalSymbols = terminalSymbols;
 	}
 
-	public int getNumberOfLexicalRuleTypes() {
+	public int getNumberOfLexicalRuleTypes()
+	{
 		return getLexicalRules().size();
 	}
-
-	public int getNumberOfSyntacticRuleTypes() {
+	
+	public int getNumberOfSyntacticRuleTypes()
+	{
 		return getSyntacticRules().size();
 	}
-
-	public int getNumberOfStartSymbols() {
+	
+	public int getNumberOfStartSymbols()
+	{
 		return getStartSymbols().size();
 	}
-
-	public int getNumberOfTerminalSymbols() {
+	
+	public int getNumberOfTerminalSymbols()
+	{
 		return getTerminalSymbols().size();
 	}
-
+	
 	public void addStartSymbol(String string) {
 		getStartSymbols().add(string);
 	}
@@ -136,9 +145,9 @@ public class Grammar {
 		getStartSymbols().remove(string);
 	}
 
-	public void addAll(List<Rule> rules) {
-		for (Rule rule : rules) {
-			addRule(rule);
+	public void addAll(List<Rule> theRules) {
+		for (int i = 0; i < theRules.size(); i++) {
+			addRule(theRules.get(i));
 		}
 	}
 

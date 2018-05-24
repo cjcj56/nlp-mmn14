@@ -92,7 +92,7 @@ public class TreeReader {
 	    
 	}
 		
-	Stack<Node> traverse = new Stack<>();
+	Stack traverse = new Stack();
 
 	for(int i = 0; i < tokens.size(); i++) {
 	    String token = tokens.get(i);

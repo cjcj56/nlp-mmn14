@@ -12,36 +12,44 @@ import tree.Node;
 import tree.Tree;
 import treebank.Treebank;
 
+
+
 /**
  * 
  * @author Reut Tsarfaty
  * 
- *         CLASS: Train
+ * CLASS: Train
  * 
- *         Definition: a learning component Role: reads off a grammar from a
- *         treebank Responsibility: keeps track of rule counts
+ * Definition: a learning component
+ * Role: reads off a grammar from a treebank
+ * Responsibility: keeps track of rule counts
  * 
  */
 
 public class Train {
 
-	/**
-	 * Implementation of a singleton pattern Avoids redundant instances in memory
-	 */
-	public static Train m_singTrainer = null;
 
-	public static Train getInstance() {
-		if (m_singTrainer == null) {
+    /**
+     * Implementation of a singleton pattern
+     * Avoids redundant instances in memory 
+     */
+	public static Train m_singTrainer = null;
+	    
+	public static Train getInstance()
+	{
+		if (m_singTrainer == null)
+		{
 			m_singTrainer = new Train();
 		}
 		return m_singTrainer;
 	}
-
+	
 	public static void main(String[] args) {
 
 	}
-
-	public Grammar train(Treebank myTreebank) {
+	
+	public Grammar train(Treebank myTreebank)
+	{
 		Grammar myGrammar = new Grammar();
 		for (int i = 0; i < myTreebank.size(); i++) {
 			Tree myTree = myTreebank.getAnalyses().get(i);
@@ -51,13 +59,15 @@ public class Train {
 		return myGrammar;
 	}
 
-	public List<Rule> getRules(Tree myTree) {
+	public List<Rule> getRules(Tree myTree)
+	{
 		List<Rule> theRules = new ArrayList<Rule>();
-
+		
 		List<Node> myNodes = myTree.getNodes();
 		for (int j = 0; j < myNodes.size(); j++) {
 			Node myNode = myNodes.get(j);
-			if (myNode.isInternal()) {
+			if (myNode.isInternal())
+			{
 				Event eLHS = new Event(myNode.getIdentifier());
 				Iterator<Node> theDaughters = myNode.getDaughters().iterator();
 				StringBuffer sb = new StringBuffer();
@@ -67,16 +77,16 @@ public class Train {
 					if (theDaughters.hasNext())
 						sb.append(" ");
 				}
-				Event eRHS = new Event(sb.toString());
+				Event eRHS = new Event (sb.toString());
 				Rule theRule = new Rule(eLHS, eRHS);
 				if (myNode.isPreTerminal())
 					theRule.setLexical(true);
 				if (myNode.isRoot())
 					theRule.setTop(true);
 				theRules.add(theRule);
-			}
+			}	
 		}
 		return theRules;
 	}
-
+	
 }
