@@ -1429,3 +1429,24 @@ java.lang.IllegalArgumentException: Cannot set lower sequence number for root (p
 
 !ENTRY org.eclipse.m2e.logback.appender 2 0 2018-05-24 20:06:47.767
 !MESSAGE Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+
+!ENTRY org.eclipse.m2e.logback.appender 2 0 2018-05-24 20:07:12.292
+!MESSAGE Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+
+!ENTRY org.eclipse.m2e.logback.appender 2 0 2018-05-24 20:07:12.298
+!MESSAGE Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+
+!ENTRY org.eclipse.core.resources 4 566 2018-05-24 20:09:48.865
+!MESSAGE Cannot set lower sequence number for root (previous: 5, new: 2). Ignoring the new value.
+!STACK 0
+java.lang.IllegalArgumentException: Cannot set lower sequence number for root (previous: 5, new: 2). Ignoring the new value.
+	at org.eclipse.core.internal.resources.SaveManager$MasterTable.put(SaveManager.java:52)
+	at java.util.Properties.load0(Properties.java:392)
+	at java.util.Properties.load(Properties.java:341)
+	at org.eclipse.core.internal.resources.SaveManager.validateMasterTableBeforeSave(SaveManager.java:1612)
+	at org.eclipse.core.internal.resources.SaveManager.saveMasterTable(SaveManager.java:1285)
+	at org.eclipse.core.internal.resources.SaveManager.saveMasterTable(SaveManager.java:1277)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1254)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1165)
+	at org.eclipse.core.internal.resources.DelayedSnapshotJob.run(DelayedSnapshotJob.java:52)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:56)
