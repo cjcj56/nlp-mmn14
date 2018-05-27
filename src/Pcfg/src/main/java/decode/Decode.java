@@ -21,7 +21,8 @@ public class Decode {
 	public static Map<String, Set<Rule>> m_mapLexicalRules = null;
 
 	/**
-	 * Implementation of a singleton pattern Avoids redundant instances in memory
+	 * Implementation of a singleton pattern
+	 * Avoids redundant instances in memory
 	 */
 	public static Decode m_singDecoder = null;
 
