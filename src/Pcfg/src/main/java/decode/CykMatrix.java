@@ -16,13 +16,11 @@ public class CykMatrix {
 
 	private int n;
 	private List<List<Map<String, Double>>> matrix;
-//	private List<BackTraceNode> backTrace;
 	private Map<Triplet<Integer, Integer, String>, Triplet<Integer, String, String>> backTrace;
 
 	public CykMatrix(int n) {
 		this.n = n;
 		initMatrix();
-//		this.backTrace = new ArrayList<>();
 		this.backTrace = new HashMap<>();
 	}
 
@@ -77,7 +75,6 @@ public class CykMatrix {
 
 	public void setBackTrace(int row, int col, String lhsSymbol,
 			int childIdx, String rhsLeftSymbol, String rhsRightSymbol) {
-//		backTrace.add(new BackTraceNode(row, col, lhsSymbol, childIdx, rhsLeftSymbol, rhsRightSymbol));
 		backTrace.put(new Triplet<>(row, col, lhsSymbol), new Triplet<Integer, String, String>(childIdx, rhsLeftSymbol, rhsRightSymbol));
 	}
 
@@ -112,25 +109,4 @@ public class CykMatrix {
 		return col - row;
 	}
 	
-	/*private static class BackTraceNode {
-		
-		public BackTraceNode(int rootRow, int rootCol, String rootSymbol, int childIdx, String leftChildSymbol,
-				String rightChildSymbol) {
-			this.rootRow = rootRow;
-			this.rootCol = rootCol;
-			this.rootSymbol = rootSymbol;
-			this.childIdx = childIdx;
-			this.leftChildSymbol = leftChildSymbol;
-			this.rightChildSymbol = rightChildSymbol;
-		}
-		
-		public int rootRow;
-		public int rootCol;
-		public String rootSymbol;
-		public int childIdx;
-		public String leftChildSymbol;
-		public String rightChildSymbol;
-		
-	}*/
-
 }
