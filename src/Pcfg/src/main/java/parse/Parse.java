@@ -1,22 +1,23 @@
 package parse;
 
-import grammar.Grammar;
-import grammar.Rule;
-
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import bracketimport.TreebankReader;
-
 import decode.Decode;
-import train.Train;
-
+import grammar.Grammar;
+import grammar.Rule;
 import train.TrainCalculateProbs;
 import tree.Tree;
 import treebank.Treebank;
-
 import utils.LineWriter;
 
 public class Parse {
@@ -32,6 +33,8 @@ public class Parse {
 	 * 
 	 */
 	
+	private static Logger LOGGER;
+	
 	public static void main(String[] args) {
 		
 		//**************************//
@@ -46,13 +49,21 @@ public class Parse {
 			return;
 		}
 		
+		// 0. initialize
+		initLogging();
+		
 		// 1. read input
+		LOGGER.fine("args: " + Arrays.toString(args));
+		LOGGER.info("reading gold treebank");
 		Treebank myGoldTreebank = TreebankReader.getInstance().read(true, args[0]);
+		LOGGER.info("finished reading gold treebank");
+		LOGGER.info("reading train treebank");
 		Treebank myTrainTreebank = TreebankReader.getInstance().read(true, args[1]);
+		LOGGER.info("finished reading train treebank");
 		
 		// 2. transform trees
 		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank);
-		writeParseTrees("TrainBinarizing", myTrainTreebank.getAnalyses());
+		writeParseTrees(args[2], myTrainTreebank.getAnalyses());
 		// 3. train
 		Grammar myGrammar = TrainCalculateProbs.getInstance().train(myTrainTreebank);
 		
@@ -72,6 +83,17 @@ public class Parse {
 	}
 	
 	
+	private static void initLogging() {
+		try {
+            LogManager.getLogManager().readConfiguration(new FileInputStream("conf/logging.properties"));
+            LOGGER = Logger.getLogger(Parse.class.getName());
+            LOGGER.info("Logging initiated");
+        } catch (SecurityException | IOException e) {
+            e.printStackTrace();
+        }
+	}
+
+
 	/**
 	 * Writes output to files:
 	 * = the trees are written into a .parsed file

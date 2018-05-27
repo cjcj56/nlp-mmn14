@@ -142,5 +142,10 @@ public class Rule {
 		m_bLexical = lexical;
 	}
 	
+	// binyamin
+	public boolean isUnitRule() {
+		// assert m_RHS != null;
+		return m_RHS.getSymbols().size() == 1;
+	}
 
 }

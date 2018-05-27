@@ -1,11 +1,20 @@
 package train;
 
+import static common.Consts.INFREQUENT_WORD_THRESH;
+import static common.Consts.UNK;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import grammar.Grammar;
 import grammar.Rule;
 
 import tree.Node;
+import tree.Terminal;
 import tree.Tree;
 import treebank.Treebank;
+import utils.CountMap;
 
 /**
  * @author Binyamin Kisch
@@ -31,8 +40,9 @@ public class TrainCalculateProbs extends Train {
 
     }
 
-    public Grammar train(Treebank myTreebank) {
-        Grammar grammar = super.train(myTreebank);
+    public Grammar train(Treebank treebank) {
+    	preProcess(treebank);
+        Grammar grammar = super.train(treebank);
 
         for (Rule rule : grammar.getLexicalRules()) {
             rule.setMinusLogProb(calculateProbs(grammar.getRuleCounts().get(rule),
@@ -45,7 +55,36 @@ public class TrainCalculateProbs extends Train {
         return grammar;
     }
 
-    public double calculateProbs(int countRules, double countTerminal) {
+    private void preProcess(Treebank treebank) {
+		smoothInfrequentWords(treebank);
+		
+	}
+
+	private void smoothInfrequentWords(Treebank treebank) {
+		CountMap<String> wordsCount = new CountMap<>();
+		for(Tree tree : treebank.getAnalyses()) {
+			for(Terminal terminal : tree.getTerminals()) {
+				wordsCount.increment(terminal.getIdentifier());
+			}
+		}
+		
+		Set<String> infrequentWords = new HashSet<>();
+		for(Map.Entry<String, Integer> wordCount : wordsCount.entrySet()) {
+			if(wordCount.getValue() <= INFREQUENT_WORD_THRESH) {
+				infrequentWords.add(wordCount.getKey());
+			}
+		}
+		
+		for(Tree tree : treebank.getAnalyses()) {
+			for(Terminal terminal : tree.getTerminals()) {
+				if(infrequentWords.contains(terminal.getIdentifier())) {
+					terminal.setIdentifier(UNK);
+				}
+			}
+		}
+	}
+
+	public double calculateProbs(int countRules, double countTerminal) {
         return (Math.log(countRules / countTerminal));
     }
 

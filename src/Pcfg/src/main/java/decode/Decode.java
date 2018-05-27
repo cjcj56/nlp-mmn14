@@ -3,6 +3,9 @@ package decode;
 import grammar.Grammar;
 import grammar.Rule;
 
+import static common.Consts.UNK;
+import static java.lang.Double.NEGATIVE_INFINITY;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -16,29 +19,41 @@ public class Decode {
 
 	public static Set<Rule> m_setGrammarRules = null;
 	public static Map<String, Set<Rule>> m_mapLexicalRules = null;
-	
-    /**
-     * Implementation of a singleton pattern
-     * Avoids redundant instances in memory 
-     */
+	/* public static Map<String, Set<Rule>> m_mapGrammarRules = null; */
+
+	/**
+	 * Implementation of a singleton pattern Avoids redundant instances in memory
+	 */
 	public static Decode m_singDecoder = null;
-	    
-	public static Decode getInstance(Grammar g)
-	{
-		if (m_singDecoder == null)
-		{
+
+	public static Decode getInstance(Grammar g) {
+		if (m_singDecoder == null) {
 			m_singDecoder = new Decode();
 			m_setGrammarRules = g.getSyntacticRules();
-			m_mapLexicalRules = g.getLexicalEntries();			
+			m_mapLexicalRules = g.getLexicalEntries();
+			/* initMapGrammarRules(); */
 		}
 		return m_singDecoder;
 	}
-    
-	public Tree decode(List<String> input){
-		
+
+	/**
+	 * Group rules by LHS. Assumption: Grammar is CFG !!!
+	 */
+	/*
+	 * private static void initMapGrammarRules() { m_mapGrammarRules = new
+	 * HashMap<>(); for (Rule rule : m_setGrammarRules) { String lhs =
+	 * rule.getLHS().getSymbols().get(0); Set<Rule> ruleSet =
+	 * m_mapGrammarRules.get(lhs); if(ruleSet == null) { ruleSet = new HashSet<>();
+	 * m_mapGrammarRules.put(lhs, ruleSet); } ruleSet.add(rule); }
+	 * 
+	 * }
+	 */
+
+	public Tree decode(List<String> input) {
+
 		// Done: Baseline Decoder
-		//       Returns a flat tree with NN labels on all leaves 
-		
+		// Returns a flat tree with NN labels on all leaves
+
 		Tree t = new Tree(new Node("TOP"));
 		Iterator<String> theInput = input.iterator();
 		while (theInput.hasNext()) {
@@ -48,16 +63,52 @@ public class Decode {
 			preTerminal.addDaughter(terminal);
 			t.getRoot().addDaughter(preTerminal);
 		}
-		
+
 		// TODO: CYK decoder
-		//       if CYK fails, 
-		//       use the baseline outcome
-		
-		return t;
-		
+		// if CYK fails,
+		// use the baseline outcome
+
+		CykMatrix cyk = new CykMatrix(input.size());
+		for (int j = 0; j < cyk.n(); ++j) {
+			String word = input.get(j);
+			if (!m_mapLexicalRules.containsKey(word)) {
+				word = UNK;
+			}
+			for (Rule rule : m_mapLexicalRules.get(word)) {
+				cyk.set(j, j, rule.getLHS().getSymbols().get(0), rule.getMinusLogProb());
+			}
+
+			for (int i = j - 1; i >= 0; --i) {
+				for (int k = i + 1; k < j; ++k) {
+					if ((cyk.get(i, k) != null) && (cyk.get(k, j) != null)) {
+						for (Rule rule : m_setGrammarRules) {
+							Double currProb = cyk.get(i, j, rule.getLHS().getSymbols().get(0));
+							Double computedProb;
+							boolean unitRule = rule.isUnitRule(); 
+							if (unitRule) {
+								computedProb = rule.getMinusLogProb() + currProb;
+							} else {
+								Double leftRhsSymbolProb = cyk.get(i, k, rule.getRHS().getSymbols().get(0));
+								Double rightRhsSymbolProb = cyk.get(k, j, rule.getRHS().getSymbols().get(1));
+								computedProb = rule.getMinusLogProb() + leftRhsSymbolProb + rightRhsSymbolProb;
+							}
+							if ((currProb < computedProb) && (computedProb > NEGATIVE_INFINITY)) {
+								// Rule's form: a --> b c (for binary) and a --> b (for unit)
+								String a = rule.getLHS().getSymbols().get(0); // lhsSymbol
+								String b = rule.getRHS().getSymbols().get(0); // rhsLeftSymbol
+								String c = unitRule ? null : rule.getRHS().getSymbols().get(1); // rhsRightSymbol
+								cyk.set(i, j, a, computedProb);
+								cyk.setBackTrace(i, j, a, k, b, c);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		Tree cykTree = cyk.buildTree();
+		return cykTree != null ? cykTree : t;
+
 	}
 
-	
-	
-	
 }
