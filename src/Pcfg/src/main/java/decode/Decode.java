@@ -19,7 +19,6 @@ public class Decode {
 
 	public static Set<Rule> m_setGrammarRules = null;
 	public static Map<String, Set<Rule>> m_mapLexicalRules = null;
-	/* public static Map<String, Set<Rule>> m_mapGrammarRules = null; */
 
 	/**
 	 * Implementation of a singleton pattern Avoids redundant instances in memory
@@ -31,23 +30,9 @@ public class Decode {
 			m_singDecoder = new Decode();
 			m_setGrammarRules = g.getSyntacticRules();
 			m_mapLexicalRules = g.getLexicalEntries();
-			/* initMapGrammarRules(); */
 		}
 		return m_singDecoder;
 	}
-
-	/**
-	 * Group rules by LHS. Assumption: Grammar is CFG !!!
-	 */
-	/*
-	 * private static void initMapGrammarRules() { m_mapGrammarRules = new
-	 * HashMap<>(); for (Rule rule : m_setGrammarRules) { String lhs =
-	 * rule.getLHS().getSymbols().get(0); Set<Rule> ruleSet =
-	 * m_mapGrammarRules.get(lhs); if(ruleSet == null) { ruleSet = new HashSet<>();
-	 * m_mapGrammarRules.put(lhs, ruleSet); } ruleSet.add(rule); }
-	 * 
-	 * }
-	 */
 
 	public Tree decode(List<String> input) {
 
@@ -108,7 +93,6 @@ public class Decode {
 
 		Tree cykTree = cyk.buildTree();
 		return cykTree != null ? cykTree : t;
-
 	}
 
 }
