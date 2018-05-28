@@ -62,8 +62,8 @@ public class Parse {
 		LOGGER.info("finished reading train treebank");
 		
 		// 2. transform trees
-		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank);
-		writeParseTrees(args[2], myTrainTreebank.getAnalyses());
+		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank, -1);
+		writeParseTrees("TrainBinarizing", myTrainTreebank.getAnalyses());
 		// 3. train
 		Grammar myGrammar = TrainCalculateProbs.getInstance().train(myTrainTreebank);
 		
