@@ -85,7 +85,7 @@ public class Parse {
 	
 	private static void initLogging() {
 		try {
-            LogManager.getLogManager().readConfiguration(new FileInputStream("conf/logging.properties"));
+            LogManager.getLogManager().readConfiguration(new FileInputStream("./src/Pcfg/conf/logging.properties"));
             LOGGER = Logger.getLogger(Parse.class.getName());
             LOGGER.info("Logging initiated");
         } catch (SecurityException | IOException e) {
