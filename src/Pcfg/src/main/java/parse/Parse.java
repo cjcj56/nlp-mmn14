@@ -34,6 +34,7 @@ public class Parse {
 	 */
 	
 	private static Logger LOGGER;
+	public static final String LOG_CONF = "D:\\Limudim\\OpenU\\2018b_22933_IntroToNLP\\hw\\hw4\\workspace\\nlp-mmn14\\src\\Pcfg\\conf\\logging.properties";
 	
 	public static void main(String[] args) {
 		
@@ -50,7 +51,7 @@ public class Parse {
 		}
 		
 		// 0. initialize
-		initLogging();
+		initLogging(LOG_CONF);
 		
 		// 1. read input
 		LOGGER.fine("args: " + Arrays.toString(args));
@@ -83,9 +84,9 @@ public class Parse {
 	}
 	
 	
-	private static void initLogging() {
+	private static void initLogging(String logConf) {
 		try {
-            LogManager.getLogManager().readConfiguration(new FileInputStream("./src/Pcfg/conf/logging.properties"));
+            LogManager.getLogManager().readConfiguration(new FileInputStream(logConf));
             LOGGER = Logger.getLogger(Parse.class.getName());
             LOGGER.info("Logging initiated");
         } catch (SecurityException | IOException e) {

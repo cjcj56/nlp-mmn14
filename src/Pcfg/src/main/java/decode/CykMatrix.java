@@ -17,6 +17,7 @@ public class CykMatrix {
 	private int n;
 	private List<List<Map<String, Double>>> matrix;
 	private Map<Triplet<Integer, Integer, String>, Triplet<Integer, String, String>> backTrace;
+	private static final Triplet<Integer, String, String> TERMINAL_TRIPLET = new Triplet<>(-1, null, null);
 
 	public CykMatrix(int n) {
 		this.n = n;
@@ -75,7 +76,7 @@ public class CykMatrix {
 
 	public void setBackTrace(int row, int col, String lhsSymbol,
 			int childIdx, String rhsLeftSymbol, String rhsRightSymbol) {
-		backTrace.put(new Triplet<>(row, col, lhsSymbol), new Triplet<Integer, String, String>(childIdx, rhsLeftSymbol, rhsRightSymbol));
+		backTrace.put(new Triplet<>(row, getRealColIdx(row, col), lhsSymbol), new Triplet<>(childIdx, rhsLeftSymbol, rhsRightSymbol));
 	}
 
 	public Tree buildTree() {
@@ -95,7 +96,7 @@ public class CykMatrix {
 
 	private void buildChild(Node node, Triplet<Integer, Integer, String> triplet) {
 		Triplet<Integer, String, String> nextTriplet = backTrace.get(triplet);
-		if(nextTriplet != null) {
+		if(! TERMINAL_TRIPLET.equals(nextTriplet)) {
 			Node leftNode = new Node(nextTriplet.b);
 			node.addDaughter(leftNode);
 			buildChild(leftNode, new Triplet<Integer, Integer, String>(triplet.a, nextTriplet.a, nextTriplet.b));
