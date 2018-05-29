@@ -62,8 +62,8 @@ public class Parse {
 		LOGGER.info("finished reading train treebank");
 		
 		// 2. transform trees
-		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank);
-		writeParseTrees(args[2], myTrainTreebank.getAnalyses());
+		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank, -1);
+		writeParseTrees("TrainBinarizing", myTrainTreebank.getAnalyses());
 		// 3. train
 		Grammar myGrammar = TrainCalculateProbs.getInstance().train(myTrainTreebank);
 		
@@ -85,7 +85,7 @@ public class Parse {
 	
 	private static void initLogging() {
 		try {
-            LogManager.getLogManager().readConfiguration(new FileInputStream("conf/logging.properties"));
+            LogManager.getLogManager().readConfiguration(new FileInputStream("./src/Pcfg/conf/logging.properties"));
             LOGGER = Logger.getLogger(Parse.class.getName());
             LOGGER.info("Logging initiated");
         } catch (SecurityException | IOException e) {
