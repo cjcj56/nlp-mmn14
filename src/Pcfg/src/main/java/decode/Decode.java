@@ -6,7 +6,6 @@ import grammar.Rule;
 import static common.Consts.UNK;
 import static java.lang.Double.NEGATIVE_INFINITY;
 
-import java.nio.channels.SelectableChannel;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
