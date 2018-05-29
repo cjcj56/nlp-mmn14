@@ -52,7 +52,7 @@ public class CykMatrix {
 	}
 
 	public Map<String, Double> get(int row, int col) {
-		int realColIdx = getRealColIdx(row, col); 
+		int realColIdx = getRealColIdx(row, col);
 		assertIndicesInMatrixBounds(row, realColIdx);
 		return matrix.get(row).get(realColIdx);
 	}
@@ -106,7 +106,7 @@ public class CykMatrix {
 	}
 	
 	private int getRealColIdx(int row, int col) {
-		return col - row;
+		return col == row ? 0 :col - row - 1;
 	}
 	
 }

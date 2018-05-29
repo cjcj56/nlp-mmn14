@@ -63,7 +63,9 @@ public class Decode {
 			for (Rule rule : m_mapLexicalRules.get(word)) {
 				cyk.set(j, j, rule.getLHS().getSymbols().get(0), rule.getMinusLogProb());
 			}
+		}
 
+		for (int j = 0; j < cyk.n(); ++j) {
 			for (int i = j - 1; i >= 0; --i) {
 				for (int k = i + 1; k < j; ++k) {
 					if ((cyk.get(i, k) != null) && (cyk.get(k, j) != null)) {

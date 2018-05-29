@@ -117,7 +117,9 @@ public class TrainCalculateProbs extends Train {
                     newIdentifiers += "//" + node.getBrothers().get(i).getIdentifier();
                 }
             }
-            node.setIdentifier(node.getIdentifier() + "@" + newIdentifiers);
+            if(newIdentifiers != "") {
+                node.setIdentifier(node.getIdentifier() + "@" + newIdentifiers);
+            }
         }
     }
 
