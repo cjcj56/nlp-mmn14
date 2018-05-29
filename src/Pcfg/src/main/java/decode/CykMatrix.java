@@ -88,7 +88,7 @@ public class CykMatrix {
 		
 		Node rootNode = new Node(TOP);
 		Tree t = new Tree(rootNode);
-		buildChild(rootNode, new Triplet<>(rootTriplet.a, nextTriplet.a, nextTriplet.b));		
+		buildChild(rootNode, new Triplet<>(rootTriplet.a, nextTriplet.a, nextTriplet.b));
 		buildChild(rootNode, new Triplet<>(nextTriplet.a, rootTriplet.b, nextTriplet.c));		
 		
 		return t;

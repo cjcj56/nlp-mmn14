@@ -79,7 +79,7 @@ public class Decode {
 								computedProb = rule.getMinusLogProb() + currProb;
 							} else {
 								Double leftRhsSymbolProb = cyk.get(i, k, rule.getRHS().getSymbols().get(0));
-								Double rightRhsSymbolProb = cyk.get(k, j, rule.getRHS().getSymbols().get(1));
+								Double rightRhsSymbolProb = cyk.get(k+1, j, rule.getRHS().getSymbols().get(1));
 								computedProb = rule.getMinusLogProb() + leftRhsSymbolProb + rightRhsSymbolProb;
 							}
 							if ((currProb < computedProb) && (computedProb > NEGATIVE_INFINITY)) {
