@@ -55,6 +55,8 @@ public class Train {
 			Tree myTree = myTreebank.getAnalyses().get(i);
 			List<Rule> theRules = getRules(myTree);
 			myGrammar.addAll(theRules);
+
+			myGrammar.getStartSymbols().add(myTree.getNodes().get(1).getIdentifier());
 		}
 		return myGrammar;
 	}
