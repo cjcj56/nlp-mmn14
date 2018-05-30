@@ -6,7 +6,6 @@ import grammar.Rule;
 import static common.Consts.UNK;
 import static java.lang.Double.NEGATIVE_INFINITY;
 
-import java.nio.channels.SelectableChannel;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +17,7 @@ import tree.Tree;
 
 public class Decode {
 
+	public static Set<String> m_setStartSymbols = null;
 	public static Set<Rule> m_setGrammarRules = null;
 	public static Map<String, Set<Rule>> m_mapLexicalRules = null;
 
@@ -30,6 +30,7 @@ public class Decode {
 	public static Decode getInstance(Grammar g) {
 		if (m_singDecoder == null) {
 			m_singDecoder = new Decode();
+			m_setStartSymbols = g.getStartSymbols();
 			m_setGrammarRules = g.getSyntacticRules();
 			m_mapLexicalRules = g.getLexicalEntries();
 		}
@@ -61,7 +62,7 @@ public class Decode {
 			if (!m_mapLexicalRules.containsKey(word)) {
 				word = UNK;
 			}
-			for (Rule rule : m_mapLexicalRules.get(word)) {
+				for (Rule rule : m_mapLexicalRules.get(word)) {
 				cyk.set(j-1, j, rule.getLHS().getSymbols().get(0), rule.getMinusLogProb());
 				cyk.setBackTrace(j-1, j, rule.getLHS().getSymbols().get(0), -1, null, null);
 			}
@@ -70,7 +71,7 @@ public class Decode {
 				for (int k = i+1; k <= j-1; ++k) {
 //					System.out.format("j=%d, i=%d, k=%d, %s", j,i,k,System.lineSeparator());
 					if ((cyk.get(i, k) != null) && (cyk.get(k, j) != null)) {
-						for (Rule rule : m_setGrammarRules) {
+							for (Rule rule : m_setGrammarRules) {
 							Double currProb = cyk.get(i, j, rule.getLHS().getSymbols().get(0));
 							Double computedProb;
 							boolean unitRule = rule.isUnitRule(); 
@@ -97,8 +98,8 @@ public class Decode {
 		
 //		System.exit(0);
 
-		Tree cykTree = cyk.buildTree();
+		Tree cykTree = cyk.buildTree(m_setStartSymbols);
 		return cykTree != null ? cykTree : t;
 	}
-
+	
 }

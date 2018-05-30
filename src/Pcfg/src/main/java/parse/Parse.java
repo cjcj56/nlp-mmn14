@@ -1,13 +1,13 @@
 package parse;
 
-import java.io.File;
+import static common.Consts.TOP;
+
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -78,28 +78,53 @@ public class Parse {
 		LOGGER.info("training");
 		Grammar myGrammar = TrainCalculateProbs.getInstance().train(myTrainTreebank);
 
+		/*Set<Rule> rules = new HashSet<>();
+		rules.addAll(myGrammar.getLexicalRules());
+		rules.addAll(myGrammar.getSyntacticRules());
+		for(Rule rule : rules) {
+			if(rule.isTop()) {
+				System.out.println(rule.toString());
+			}
+			if(TOP.equals(rule.getLHS().getSymbols().get(0))) {
+				System.out.println(rule.toString());
+			}
+		}
+		System.out.println("end");
+		System.exit(999);*/
+		
 		// 4. decode
 		LOGGER.info("decoding");
-		int gridSize = 25;
+		Decode.getInstance(myGrammar); // populate Decode collections
+		boolean multithreaded = false;
+		int gridSize = multithreaded ? 25 : myGoldTreebank.size();
 		Map<Integer, Integer> partitionedRanges = ListPartitioner.partition(myGoldTreebank.size(), gridSize);
 		List<Tree> trees = myGoldTreebank.getAnalyses();
-		List<Tree> parsedTrees = Collections.synchronizedList(new ArrayList<Tree>());
+		List<List<Tree>> threadsOutputs = new ArrayList<>(partitionedRanges.size());
 		List<Thread> threads = new ArrayList<>(partitionedRanges.size());
 		for(Map.Entry<Integer, Integer> range : partitionedRanges.entrySet()) {
 			int start = range.getKey();
 			int end = range.getValue();
-			Thread thread = new Thread(new DecodeRunnable(myGrammar, trees.subList(start, end), parsedTrees));
+			String threadRange = String.format("(%d,%d)", start, end-1);
+			List<Tree> threadOutput = new ArrayList<>();
+			Thread thread = new Thread(new DecodeRunnable(trees.subList(start, end), threadOutput), threadRange);
 			threads.add(thread);
+			threadsOutputs.add(threadOutput);
 			thread.start();
-			LOGGER.finer(String.format("decoding partition (%d,%d)",start, end));
+			LOGGER.finer(String.format("decoding partition %s", threadRange));
 		}
 		for(Thread thread : threads) {
 			try {
 				thread.join();
+				LOGGER.finer(String.format("thread of range %s ended", thread.getName()));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				System.exit(1);
 			}
+		}
+		
+		List<Tree> parsedTrees = new ArrayList<>(trees.size());
+		for(List<Tree> threadOutput : threadsOutputs) {
+			parsedTrees.addAll(threadOutput);
 		}
 
 		// 5. de-transform trees

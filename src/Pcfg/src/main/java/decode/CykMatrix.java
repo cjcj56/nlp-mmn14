@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import common.Triplet;
 import tree.Node;
@@ -14,10 +17,13 @@ import tree.Tree;
 
 public class CykMatrix {
 
+	private static final Triplet<Integer, String, String> TERMINAL_TRIPLET = new Triplet<>(-1, null, null);
+	
+	private static final Logger LOGGER = Logger.getLogger(CykMatrix.class.getName());
+	
 	private int n;
 	private List<List<Map<String, Double>>> matrix;
 	private Map<Triplet<Integer, Integer, String>, Triplet<Integer, String, String>> backTrace;
-	private static final Triplet<Integer, String, String> TERMINAL_TRIPLET = new Triplet<>(-1, null, null);
 
 	public CykMatrix(int n) {
 		this.n = n;
@@ -79,8 +85,27 @@ public class CykMatrix {
 		backTrace.put(new Triplet<>(row, getRealColIdx(row, col), lhsSymbol), new Triplet<>(childIdx, rhsLeftSymbol, rhsRightSymbol));
 	}
 
-	public Tree buildTree() {
-		Triplet<Integer, Integer, String> rootTriplet = new Triplet<Integer, Integer, String>(1, n, TOP); // TODO : n or n - 1 ??? 
+	public Tree buildTree(Set<String> startSymbols) {
+		Map<String, Double> startSymbolProbMap = matrix.get(0).get(n-1);
+		if(startSymbolProbMap == null) {
+			return null;
+		}
+		
+		String startSymbol = null;
+		Double prob = NEGATIVE_INFINITY;
+		for (Map.Entry<String, Double> startSymbolProb : startSymbolProbMap.entrySet()) {
+			if(startSymbols.contains(startSymbolProb.getKey())) {
+				if(startSymbolProb.getValue() > prob) {
+					startSymbol = startSymbolProb.getKey();
+					prob = startSymbolProb.getValue();
+				}
+			}
+		}
+		if(startSymbol == null) {
+			return null;
+		}
+		
+		Triplet<Integer, Integer, String> rootTriplet = new Triplet<Integer, Integer, String>(1, n, startSymbol);  
 		Triplet<Integer, String, String> nextTriplet = backTrace.get(rootTriplet);  
 		if(nextTriplet == null) {
 			return null;
@@ -109,5 +134,20 @@ public class CykMatrix {
 	private int getRealColIdx(int row, int col) {
 		return col - row - 1;
 	}
+	
+	/*private void logBackTrace() {
+		List<List<List<String>>> backtraceLog = new ArrayList<>(n);
+		for(int i = 0; i < n; ++i) {
+			List<List<String>> backtraceLogSublist = new ArrayList<>(n);
+			for(int j = 0; j < n; ++j) {
+				backtraceLogSublist.add(new ArrayList<>());
+			}
+			backtraceLog.add(backtraceLogSublist);
+		}
+		
+		for(Map.Entry<Triplet<Integer, Integer, String>, Triplet<Integer, String, String>> backtraceCell : backTrace.entrySet()) {
+			backtraceLog.get(backtraceCell.getKey().a).get(backtraceLog)
+		}
+	}*/
 	
 }
