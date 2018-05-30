@@ -17,6 +17,7 @@ import decode.Decode;
 import decode.DecodeRunnable;
 import grammar.Grammar;
 import grammar.Rule;
+import train.ParentEncoding;
 import train.TrainCalculateProbs;
 import tree.Tree;
 import treebank.Treebank;
@@ -38,7 +39,7 @@ public class Parse {
 	
 	private static Logger LOGGER;
 //	public static final String LOG_CONF = "D:\\Limudim\\OpenU\\2018b_22933_IntroToNLP\\hw\\hw4\\workspace\\nlp-mmn14\\src\\Pcfg\\conf\\logging.properties";
-	public static final String LOG_CONF = "./conf/logging.properties";
+	public static final String LOG_CONF = "./src/Pcfg/conf/logging.properties";
 
 	public static void main(String[] args) {
 		
@@ -68,9 +69,12 @@ public class Parse {
 		
 		// 2. transform trees
 		LOGGER.info("transforming to CNF");
-		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank, 0);
-		writeParseTrees(args[2], myTrainTreebank.getAnalyses());
-		
+		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank, 1);
+		writeParseTrees("TrainBinarizing", myTrainTreebank.getAnalyses());
+
+//		myTrainTreebank = ParentEncoding.getInstance().smooting(myTrainTreebank);
+//		writeParseTrees("TrainBinarizingWithSmooting", myTrainTreebank.getAnalyses());
+
 		// 3. train
 		LOGGER.info("training");
 		Grammar myGrammar = TrainCalculateProbs.getInstance().train(myTrainTreebank);
