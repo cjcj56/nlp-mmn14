@@ -101,6 +101,50 @@ public class TrainCalculateProbs extends Train {
         return myTreebank;
     }
 
+    private Node updateNode(Node node) {
+        if (node.getDaughters().size() > 2) {
+            Node newNode = (Node) node.clone();
+            newNode.cloneBrothers(node);
+
+            Node firstNode = updateNode(node.getDaughters().get(0));
+            newNode.removeDaughter(newNode.getDaughters().get(0));
+            newNode.addBrother(firstNode);
+            Node secondNode = updateNode(newNode);
+
+            node.cleanDaughters();
+            node.addDaughter(firstNode);
+            node.addDaughter(secondNode);
+
+        } else {
+            for (Node childNode : node.getDaughters()) {
+                updateNode(childNode);
+            }
+        }
+        return node;
+    }
+
+    private void editIdentifier(Node node, int h) {
+        if (node.isBrother()) {
+            String newIdentifiers = "";
+            if (h == -1) {
+                for (Node borther : node.getBrothers()) {
+                    newIdentifiers += "//" + borther.getIdentifier();
+                }
+            } else {
+                int i = node.getBrothers().size() - h;
+                if (i < 0) {
+                    i = 0;
+                }
+                for (; h > 0 && i < node.getBrothers().size(); i++, h--) {
+                    newIdentifiers += "//" + node.getBrothers().get(i).getIdentifier();
+                }
+            }
+            if(newIdentifiers != "") {
+                node.setIdentifier(node.getIdentifier() + "@" + newIdentifiers);
+            }
+        }
+    }
+
     public List<Tree> deTransformTree(List<Tree> myTreebank){
         for (Tree tree : myTreebank) {
             deTransform(tree.getRoot());
@@ -128,49 +172,6 @@ public class TrainCalculateProbs extends Train {
             }
         }
         return false;
-    }
-
-    private void editIdentifier(Node node, int h) {
-        if (node.isBrother()) {
-            String newIdentifiers = "";
-            if (h == -1) {
-                for (Node borther : node.getBrothers()) {
-                    newIdentifiers += "//" + borther.getIdentifier();
-                }
-            } else {
-                int i = node.getBrothers().size() - h;
-                if (i < 0) {
-                    i = 0;
-                }
-                for (; h > 0 && i < node.getBrothers().size(); i++, h--) {
-                    newIdentifiers += "//" + node.getBrothers().get(i).getIdentifier();
-                }
-            }
-            if(newIdentifiers != "") {
-                node.setIdentifier(node.getIdentifier() + "@" + newIdentifiers);
-            }
-        }
-    }
-
-    private Node updateNode(Node node) {
-        if (node.getDaughters().size() > 2) {
-            Node newNode = (Node) node.clone();
-            newNode.cloneBrothers(node);
-
-            newNode.removeDaughter(newNode.getDaughters().get(0));
-            Node firstNode = node.getDaughters().get(0);
-            newNode.addBrother(firstNode);
-            Node secondNode = updateNode(newNode);
-
-            node.cleanDaughters();
-            node.addDaughter(firstNode);
-            node.addDaughter(secondNode);
-        } else {
-            for (Node childNode : node.getDaughters()) {
-                updateNode(childNode);
-            }
-        }
-        return node;
     }
 
 }
