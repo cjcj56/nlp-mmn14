@@ -1,1 +1,2 @@
 docker build -t cjcj56/createevalb:latest .
+docker run -v D:\Limudim\OpenU\2018b_22933_IntroToNLP\hw\hw4\workspace\nlp-mmn14\docker\output:/output -it cjcj56/createevalb:latest cp /output.eval /output/
