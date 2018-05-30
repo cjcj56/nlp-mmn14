@@ -115,14 +115,14 @@ public class CykMatrix {
 
 	private void buildChild(Node node, Triplet<Integer, Integer, String> triplet) {
 		Triplet<Integer, String, String> nextTriplet = backTrace.get(triplet);
-		if((nextTriplet != null) && (! TERMINAL_TRIPLET.equals(nextTriplet))) { // TODO : in what situation nextTriplet == null ??
+		if(! TERMINAL_TRIPLET.equals(nextTriplet)) { 
 			Node leftNode = new Node(nextTriplet.b);
 			node.addDaughter(leftNode);
-			buildChild(leftNode, new Triplet<Integer, Integer, String>(triplet.a, nextTriplet.a, nextTriplet.b));
+			buildChild(leftNode, new Triplet<Integer, Integer, String>(triplet.a, getRealColIdx(triplet.a, nextTriplet.a), nextTriplet.b));
 			if(nextTriplet.c != null) {
 				Node rightNode = new Node(nextTriplet.c);
 				node.addDaughter(rightNode);
-				buildChild(rightNode, new Triplet<Integer, Integer, String>(nextTriplet.a, triplet.b, nextTriplet.c));
+				buildChild(rightNode, new Triplet<Integer, Integer, String>(nextTriplet.a, getRealColIdx(nextTriplet.a, triplet.b), nextTriplet.c));
 			}
 		}
 	}

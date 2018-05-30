@@ -82,7 +82,7 @@ public class Parse {
 		// 4. decode
 		LOGGER.info("decoding");
 		Decode.getInstance(myGrammar); // populate Decode collections
-		boolean multithreaded = false;
+		boolean multithreaded = true;
 		int gridSize = multithreaded ? 25 : myGoldTreebank.size();
 		Map<Integer, Integer> partitionedRanges = ListPartitioner.partition(myGoldTreebank.size(), gridSize);
 		List<Tree> trees = myGoldTreebank.getAnalyses();

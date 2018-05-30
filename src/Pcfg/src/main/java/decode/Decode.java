@@ -62,7 +62,7 @@ public class Decode {
 			if (!m_mapLexicalRules.containsKey(word)) {
 				word = UNK;
 			}
-				for (Rule rule : m_mapLexicalRules.get(word)) {
+			for (Rule rule : m_mapLexicalRules.get(word)) {
 				cyk.set(j-1, j, rule.getLHS().getSymbols().get(0), rule.getMinusLogProb());
 				cyk.setBackTrace(j-1, j, rule.getLHS().getSymbols().get(0), -1, null, null);
 			}
