@@ -34,8 +34,9 @@ public class Parse {
 	 */
 	
 	private static Logger LOGGER;
-	public static final String LOG_CONF = "D:\\Limudim\\OpenU\\2018b_22933_IntroToNLP\\hw\\hw4\\workspace\\nlp-mmn14\\src\\Pcfg\\conf\\logging.properties";
-	
+//	public static final String LOG_CONF = "D:\\Limudim\\OpenU\\2018b_22933_IntroToNLP\\hw\\hw4\\workspace\\nlp-mmn14\\src\\Pcfg\\conf\\logging.properties";
+	public static final String LOG_CONF = "./src/Pcfg/conf/logging.properties";
+
 	public static void main(String[] args) {
 		
 		//**************************//
@@ -63,22 +64,26 @@ public class Parse {
 		LOGGER.info("finished reading train treebank");
 		
 		// 2. transform trees
-		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank, 0);
-		writeParseTrees(args[2], myTrainTreebank.getAnalyses());
+		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank, -1);
+		writeParseTrees("TrainBinarizing", myTrainTreebank.getAnalyses());
+
 		// 3. train
 		Grammar myGrammar = TrainCalculateProbs.getInstance().train(myTrainTreebank);
-		
+
 		// 4. decode
-		List<Tree> myParseTrees = new ArrayList<Tree>();		
+		List<Tree> myParseTrees = new ArrayList<Tree>();
 		for (int i = 0; i < myGoldTreebank.size(); i++) {
 			List<String> mySentence = myGoldTreebank.getAnalyses().get(i).getYield();
 			Tree myParseTree = Decode.getInstance(myGrammar).decode(mySentence);
 			myParseTrees.add(myParseTree);
 		}
-		
+
 		// 5. de-transform trees
 		// TODO
-		
+		writeParseTrees("parseBinarizing", myParseTrees);
+		myParseTrees = TrainCalculateProbs.getInstance().deTransformTree(myParseTrees);
+		writeParseTrees("parseDeBinarizing", myParseTrees);
+
 		// 6. write output
 		writeOutput(args[2], myGrammar, myParseTrees);	
 	}

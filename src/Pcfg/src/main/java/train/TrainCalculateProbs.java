@@ -101,6 +101,35 @@ public class TrainCalculateProbs extends Train {
         return myTreebank;
     }
 
+    public List<Tree> deTransformTree(List<Tree> myTreebank){
+        for (Tree tree : myTreebank) {
+            deTransform(tree.getRoot());
+        }
+        return myTreebank;
+    }
+
+    private boolean deTransform(Node node) {
+        if(node.isBrother()){
+            Node parentNode = node.getParent();
+            parentNode.removeDaughter(parentNode.getDaughters().get(parentNode.getDaughters().size()-1));
+            for(int i=0;i<node.getDaughters().size();i++) {
+                parentNode.addDaughter(node.getDaughters().get(i));
+            }
+            return true;
+        }
+
+        if (!node.isLeaf()) {
+            for (Node nd : node.getDaughters()){
+                boolean check = deTransform(nd);
+                if (check) {
+                    deTransform(node);
+                    break;
+                }
+            }
+        }
+        return false;
+    }
+
     private void editIdentifier(Node node, int h) {
         if (node.isBrother()) {
             String newIdentifiers = "";
