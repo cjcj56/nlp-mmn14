@@ -131,19 +131,4 @@ public class CykMatrix {
 		return col - row - 1;
 	}
 	
-	/*private void logBackTrace() {
-		List<List<List<String>>> backtraceLog = new ArrayList<>(n);
-		for(int i = 0; i < n; ++i) {
-			List<List<String>> backtraceLogSublist = new ArrayList<>(n);
-			for(int j = 0; j < n; ++j) {
-				backtraceLogSublist.add(new ArrayList<>());
-			}
-			backtraceLog.add(backtraceLogSublist);
-		}
-		
-		for(Map.Entry<Triplet<Integer, Integer, String>, Triplet<Integer, String, String>> backtraceCell : backTrace.entrySet()) {
-			backtraceLog.get(backtraceCell.getKey().a).get(backtraceLog)
-		}
-	}*/
-	
 }
