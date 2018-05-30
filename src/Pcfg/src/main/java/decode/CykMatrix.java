@@ -80,7 +80,7 @@ public class CykMatrix {
 	}
 
 	public Tree buildTree() {
-		Triplet<Integer, Integer, String> rootTriplet = new Triplet<Integer, Integer, String>(0, n-1, TOP); // TODO : n or n - 1 ??? 
+		Triplet<Integer, Integer, String> rootTriplet = new Triplet<Integer, Integer, String>(1, n, TOP); // TODO : n or n - 1 ??? 
 		Triplet<Integer, String, String> nextTriplet = backTrace.get(rootTriplet);  
 		if(nextTriplet == null) {
 			return null;
@@ -107,7 +107,7 @@ public class CykMatrix {
 	}
 	
 	private int getRealColIdx(int row, int col) {
-		return col == row ? 0 :col - row - 1;
+		return col - row - 1;
 	}
 	
 }

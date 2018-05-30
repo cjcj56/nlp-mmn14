@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-import java.util.logging.Level;
 
 import bracketimport.TreebankReader;
 import decode.Decode;
@@ -35,7 +34,7 @@ public class Parse {
 	
 	private static Logger LOGGER;
 //	public static final String LOG_CONF = "D:\\Limudim\\OpenU\\2018b_22933_IntroToNLP\\hw\\hw4\\workspace\\nlp-mmn14\\src\\Pcfg\\conf\\logging.properties";
-	public static final String LOG_CONF = "./src/Pcfg/conf/logging.properties";
+	public static final String LOG_CONF = "./conf/logging.properties";
 
 	public static void main(String[] args) {
 		
@@ -83,7 +82,6 @@ public class Parse {
 		}
 
 		// 5. de-transform trees
-		// TODO
 		writeParseTrees("parseBinarizing", myParseTrees);
 		myParseTrees = TrainCalculateProbs.getInstance().deTransformTree(myParseTrees);
 		writeParseTrees("parseDeBinarizing", myParseTrees);
@@ -127,7 +125,7 @@ public class Parse {
 			List<Tree> myTrees) {
 		LineWriter writer = new LineWriter(sExperimentName+".parsed");
 		for (int i = 0; i < myTrees.size(); i++) {
-			LOGGER.finer(String.format("writing tree %d", i));
+			LOGGER.finest(String.format("writing tree %d", i));
 			writer.writeLine(myTrees.get(i).toString());
 		}
 		writer.close();
