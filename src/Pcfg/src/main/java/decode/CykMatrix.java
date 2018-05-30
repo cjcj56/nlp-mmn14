@@ -12,12 +12,11 @@ import java.util.logging.Logger;
 
 import common.Triplet;
 import tree.Node;
+import tree.Terminal;
 import tree.Tree;
 
 public class CykMatrix {
 
-	private static final Triplet<Integer, String, String> TERMINAL_TRIPLET = new Triplet<>(-1, null, null);
-	
 	private static final Logger LOGGER = Logger.getLogger(CykMatrix.class.getName());
 	
 	private int n;
@@ -107,15 +106,23 @@ public class CykMatrix {
 		Triplet<Integer, Integer, String> rootTriplet = new Triplet<Integer, Integer, String>(0, n-1, startSymbol);  
 		
 		Node rootNode = new Node(TOP);
+		rootNode.setRoot(true);
+		
 		Tree t = new Tree(rootNode);
-		buildChild(rootNode, rootTriplet);
+		
+		Node childNode = new Node(startSymbol);
+		rootNode.addDaughter(childNode);
+		buildChild(childNode, rootTriplet);
 		
 		return t;
 	}
 
 	private void buildChild(Node node, Triplet<Integer, Integer, String> triplet) {
 		Triplet<Integer, String, String> nextTriplet = backTrace.get(triplet);
-		if(! TERMINAL_TRIPLET.equals(nextTriplet)) { 
+		if(isTerminal(nextTriplet)) {
+			Terminal terminal = new Terminal(nextTriplet.b);
+			node.addDaughter(terminal);
+		} else {
 			Node leftNode = new Node(nextTriplet.b);
 			node.addDaughter(leftNode);
 			buildChild(leftNode, new Triplet<Integer, Integer, String>(triplet.a, getRealColIdx(triplet.a, nextTriplet.a), nextTriplet.b));
@@ -129,6 +136,10 @@ public class CykMatrix {
 	
 	private int getRealColIdx(int row, int col) {
 		return col - row - 1;
+	}
+	
+	private boolean isTerminal(Triplet<Integer, String, String> triplet) {
+		return triplet.a == -1;
 	}
 	
 }
