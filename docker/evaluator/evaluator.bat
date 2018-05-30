@@ -1,0 +1,1 @@
+docker build -t cjcj56/createevalb:latest .
