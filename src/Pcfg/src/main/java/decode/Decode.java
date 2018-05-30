@@ -69,7 +69,6 @@ public class Decode {
 
 			for (int i = j - 2; i >= 0; --i) {
 				for (int k = i+1; k <= j-1; ++k) {
-//					System.out.format("j=%d, i=%d, k=%d, %s", j,i,k,System.lineSeparator());
 					if ((cyk.get(i, k) != null) && (cyk.get(k, j) != null)) {
 						for (Rule rule : m_setGrammarRules) {
 							Double currProb = cyk.get(i, j, rule.getLHS().getSymbols().get(0));
@@ -96,8 +95,6 @@ public class Decode {
 			}
 		}
 		
-//		System.exit(0);
-
 		Tree cykTree = cyk.buildTree(m_setStartSymbols);
 		return cykTree != null ? cykTree : t;
 	}
