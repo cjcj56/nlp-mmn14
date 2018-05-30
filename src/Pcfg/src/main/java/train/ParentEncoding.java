@@ -8,33 +8,32 @@ import java.util.List;
 
 public class ParentEncoding {
 
-    public static ParentEncoding m_singParentEncoding = null;
+	public static ParentEncoding m_singParentEncoding = null;
 
-    public static ParentEncoding getInstance() {
-        if (m_singParentEncoding == null) {
-            m_singParentEncoding = new ParentEncoding();
-        }
-        return m_singParentEncoding;
-    }
+	public static ParentEncoding getInstance() {
+		if (m_singParentEncoding == null) {
+			m_singParentEncoding = new ParentEncoding();
+		}
+		return m_singParentEncoding;
+	}
 
-    public static void main(String[] args) {
-    }
+	public static void main(String[] args) {
+	}
 
-    public Treebank smooting(Treebank myTrees){
-        for(Tree tree : myTrees.getAnalyses()){
-            addFatherForChild(tree.getNodes(),tree.getRoot());
-        }
-        return myTrees;
-    }
+	public Treebank smooting(Treebank treebank) {
+		for (Tree tree : treebank.getAnalyses()) {
+			addFatherForChild(tree.getNodes());
+		}
+		return treebank;
+	}
 
-    private void addFatherForChild(List<Node> nodes, Node root) {
-        for(int i=nodes.size()-1;i>0;i--) {
-            Node node = nodes.get(i);
-            Node parent = node.getParent();
-            if (parent != null)
-            {
-                node.setIdentifier(node.getIdentifier() + '#' + parent.getIdentifier() + '#');
-            }
-        }
-    }
+	private void addFatherForChild(List<Node> nodes) {
+		for (int i = nodes.size() - 1; i > 0; i--) { // nodes.get(0) == root nodes
+			Node node = nodes.get(i);
+			Node parent = node.getParent();
+			if (parent != null) {
+				node.setIdentifier(node.getIdentifier() + '#' + parent.getIdentifier() + '#');
+			}
+		}
+	}
 }
