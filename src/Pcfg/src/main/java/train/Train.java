@@ -3,10 +3,12 @@ package train;
 import grammar.Event;
 import grammar.Grammar;
 import grammar.Rule;
+import parse.Parse;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import tree.Node;
 import tree.Tree;
@@ -28,7 +30,8 @@ import treebank.Treebank;
 
 public class Train {
 
-
+	private static final Logger LOGGER = Logger.getLogger(Train.class.getName());
+	
     /**
      * Implementation of a singleton pattern
      * Avoids redundant instances in memory 
@@ -52,6 +55,7 @@ public class Train {
 	{
 		Grammar myGrammar = new Grammar();
 		for (int i = 0; i < myTreebank.size(); i++) {
+			LOGGER.finer(String.format("training on tree %d", i));
 			Tree myTree = myTreebank.getAnalyses().get(i);
 			List<Rule> theRules = getRules(myTree);
 			myGrammar.addAll(theRules);

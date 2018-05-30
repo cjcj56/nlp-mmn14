@@ -64,9 +64,7 @@ public class Decode {
 				cyk.set(j, j, rule.getLHS().getSymbols().get(0), rule.getMinusLogProb());
 				cyk.setBackTrace(j, j, rule.getLHS().getSymbols().get(0), -1, null, null);
 			}
-		}
 
-		for (int j = 0; j < cyk.n(); ++j) {
 			for (int i = j - 1; i >= 0; --i) {
 				for (int k = i; k < j; ++k) {
 //					System.out.format("j=%d, i=%d, k=%d, %s", j,i,k,System.lineSeparator());

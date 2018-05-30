@@ -64,16 +64,20 @@ public class Parse {
 		LOGGER.info("finished reading train treebank");
 		
 		// 2. transform trees
-		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank, -1);
-		writeParseTrees("TrainBinarizing", myTrainTreebank.getAnalyses());
-
+		LOGGER.info("transforming to CNF");
+		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank, 0);
+		writeParseTrees(args[2], myTrainTreebank.getAnalyses());
+		
 		// 3. train
+		LOGGER.info("training");
 		Grammar myGrammar = TrainCalculateProbs.getInstance().train(myTrainTreebank);
 
 		// 4. decode
-		List<Tree> myParseTrees = new ArrayList<Tree>();
+		LOGGER.info("decoding");
+		List<Tree> myParseTrees = new ArrayList<Tree>();		
 		for (int i = 0; i < myGoldTreebank.size(); i++) {
 			List<String> mySentence = myGoldTreebank.getAnalyses().get(i).getYield();
+			LOGGER.finer(String.format("decoding tree %d",i));
 			Tree myParseTree = Decode.getInstance(myGrammar).decode(mySentence);
 			myParseTrees.add(myParseTree);
 		}
@@ -123,6 +127,7 @@ public class Parse {
 			List<Tree> myTrees) {
 		LineWriter writer = new LineWriter(sExperimentName+".parsed");
 		for (int i = 0; i < myTrees.size(); i++) {
+			LOGGER.finer(String.format("writing tree %d", i));
 			writer.writeLine(myTrees.get(i).toString());
 		}
 		writer.close();
