@@ -43,7 +43,7 @@ public class TrainCalculateProbs extends Train {
     }
 
     public Grammar train(Treebank treebank) {
-    	preProcess(treebank);
+        preProcess(treebank);
         Grammar grammar = super.train(treebank);
 
         for (Rule rule : grammar.getLexicalRules()) {
@@ -58,35 +58,35 @@ public class TrainCalculateProbs extends Train {
     }
 
     private void preProcess(Treebank treebank) {
-		smoothInfrequentWords(treebank);
-		
-	}
+        smoothInfrequentWords(treebank);
 
-	private void smoothInfrequentWords(Treebank treebank) {
-		CountMap<String> wordsCount = new CountMap<>();
-		for(Tree tree : treebank.getAnalyses()) {
-			for(Terminal terminal : tree.getTerminals()) {
-				wordsCount.increment(terminal.getIdentifier());
-			}
-		}
-		
-		Set<String> infrequentWords = new HashSet<>();
-		for(Map.Entry<String, Integer> wordCount : wordsCount.entrySet()) {
-			if(wordCount.getValue() <= INFREQUENT_WORD_THRESH) {
-				infrequentWords.add(wordCount.getKey());
-			}
-		}
-		
-		for(Tree tree : treebank.getAnalyses()) {
-			for(Terminal terminal : tree.getTerminals()) {
-				if(infrequentWords.contains(terminal.getIdentifier())) {
-					terminal.setIdentifier(UNK);
-				}
-			}
-		}
-	}
+    }
 
-	public double calculateProbs(int countRules, double countTerminal) {
+    private void smoothInfrequentWords(Treebank treebank) {
+        CountMap<String> wordsCount = new CountMap<>();
+        for (Tree tree : treebank.getAnalyses()) {
+            for (Terminal terminal : tree.getTerminals()) {
+                wordsCount.increment(terminal.getIdentifier());
+            }
+        }
+
+        Set<String> infrequentWords = new HashSet<>();
+        for (Map.Entry<String, Integer> wordCount : wordsCount.entrySet()) {
+            if (wordCount.getValue() <= INFREQUENT_WORD_THRESH) {
+                infrequentWords.add(wordCount.getKey());
+            }
+        }
+
+        for (Tree tree : treebank.getAnalyses()) {
+            for (Terminal terminal : tree.getTerminals()) {
+                if (infrequentWords.contains(terminal.getIdentifier())) {
+                    terminal.setIdentifier(UNK);
+                }
+            }
+        }
+    }
+
+    public double calculateProbs(int countRules, double countTerminal) {
         return (Math.log(countRules / countTerminal));
     }
 
@@ -138,13 +138,11 @@ public class TrainCalculateProbs extends Train {
                     newIdentifiers += "//" + node.getBrothers().get(i).getIdentifier();
                 }
             }
-            if(newIdentifiers != "") {
-                node.setIdentifier(node.getIdentifier() + "@" + newIdentifiers);
-            }
+            node.setIdentifier(node.getIdentifier() + "@" + newIdentifiers);
         }
     }
 
-    public List<Tree> deTransformTree(List<Tree> myTreebank){
+    public List<Tree> deTransformTree(List<Tree> myTreebank) {
         for (Tree tree : myTreebank) {
             deTransform(tree.getRoot());
         }
@@ -152,17 +150,17 @@ public class TrainCalculateProbs extends Train {
     }
 
     private boolean deTransform(Node node) {
-        if(node.isBrother()){
+        if (node.isBrother()) {
             Node parentNode = node.getParent();
-            parentNode.removeDaughter(parentNode.getDaughters().get(parentNode.getDaughters().size()-1));
-            for(int i=0;i<node.getDaughters().size();i++) {
+            parentNode.removeDaughter(parentNode.getDaughters().get(parentNode.getDaughters().size() - 1));
+            for (int i = 0; i < node.getDaughters().size(); i++) {
                 parentNode.addDaughter(node.getDaughters().get(i));
             }
             return true;
         }
 
         if (!node.isLeaf()) {
-            for (Node nd : node.getDaughters()){
+            for (Node nd : node.getDaughters()) {
                 boolean check = deTransform(nd);
                 if (check) {
                     deTransform(node);
