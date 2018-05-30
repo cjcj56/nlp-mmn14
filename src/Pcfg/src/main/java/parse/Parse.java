@@ -39,7 +39,7 @@ public class Parse {
 	
 	private static Logger LOGGER;
 //	public static final String LOG_CONF = "D:\\Limudim\\OpenU\\2018b_22933_IntroToNLP\\hw\\hw4\\workspace\\nlp-mmn14\\src\\Pcfg\\conf\\logging.properties";
-	public static final String LOG_CONF = "./src/Pcfg/conf/logging.properties";
+	public static final String LOG_CONF = "./conf/logging.properties";
 
 	public static void main(String[] args) {
 		
