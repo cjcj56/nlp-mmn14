@@ -39,7 +39,7 @@ public class Parse {
 	
 	private static Logger LOGGER;
 //	public static final String LOG_CONF = "D:\\Limudim\\OpenU\\2018b_22933_IntroToNLP\\hw\\hw4\\workspace\\nlp-mmn14\\src\\Pcfg\\conf\\logging.properties";
-	public static final String LOG_CONF = "./src/Pcfg/conf/logging.properties";
+	public static final String LOG_CONF = "./conf/logging.properties";
 
 	public static void main(String[] args) {
 		
@@ -82,7 +82,7 @@ public class Parse {
 		// 4. decode
 		LOGGER.info("decoding");
 		Decode.getInstance(myGrammar); // populate Decode collections
-		boolean multithreaded = true;
+		boolean multithreaded = false;
 		int gridSize = multithreaded ? 25 : myGoldTreebank.size();
 		Map<Integer, Integer> partitionedRanges = ListPartitioner.partition(myGoldTreebank.size(), gridSize);
 		List<Tree> trees = myGoldTreebank.getAnalyses();
