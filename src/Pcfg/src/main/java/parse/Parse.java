@@ -4,20 +4,24 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import bracketimport.TreebankReader;
 import decode.Decode;
+import decode.DecodeRunnable;
 import grammar.Grammar;
 import grammar.Rule;
 import train.TrainCalculateProbs;
 import tree.Tree;
 import treebank.Treebank;
 import utils.LineWriter;
+import utils.ListPartitioner;
 
 public class Parse {
 
@@ -73,21 +77,35 @@ public class Parse {
 
 		// 4. decode
 		LOGGER.info("decoding");
-		List<Tree> myParseTrees = new ArrayList<Tree>();		
-		for (int i = 0; i < myGoldTreebank.size(); i++) {
-			List<String> mySentence = myGoldTreebank.getAnalyses().get(i).getYield();
-			LOGGER.finer(String.format("decoding tree %d",i));
-			Tree myParseTree = Decode.getInstance(myGrammar).decode(mySentence);
-			myParseTrees.add(myParseTree);
+		int gridSize = 25;
+		Map<Integer, Integer> partitionedRanges = ListPartitioner.partition(myGoldTreebank.size(), gridSize);
+		List<Tree> trees = myGoldTreebank.getAnalyses();
+		List<Tree> parsedTrees = Collections.synchronizedList(new ArrayList<Tree>());
+		List<Thread> threads = new ArrayList<>(partitionedRanges.size());
+		for(Map.Entry<Integer, Integer> range : partitionedRanges.entrySet()) {
+			int start = range.getKey();
+			int end = range.getValue();
+			Thread thread = new Thread(new DecodeRunnable(myGrammar, trees.subList(start, end), parsedTrees));
+			threads.add(thread);
+			thread.start();
+			LOGGER.finer(String.format("decoding partition (%d,%d)",start, end));
+		}
+		for(Thread thread : threads) {
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
 		}
 
 		// 5. de-transform trees
-		writeParseTrees("parseBinarizing", myParseTrees);
-		myParseTrees = TrainCalculateProbs.getInstance().deTransformTree(myParseTrees);
-		writeParseTrees("parseDeBinarizing", myParseTrees);
+		writeParseTrees("parseBinarizing", parsedTrees);
+		parsedTrees = TrainCalculateProbs.getInstance().deTransformTree(parsedTrees);
+		writeParseTrees("parseDeBinarizing", parsedTrees);
 
 		// 6. write output
-		writeOutput(args[2], myGrammar, myParseTrees);	
+		writeOutput(args[2], myGrammar, parsedTrees);	
 	}
 	
 	

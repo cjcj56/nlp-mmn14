@@ -16,7 +16,6 @@ import tree.Tree;
 import treebank.Treebank;
 import utils.CountMap;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
