@@ -128,6 +128,7 @@ public class CykMatrix {
 			buildChild(leftNode, new Triplet<Integer, Integer, String>(triplet.a, nextTriplet.a, nextTriplet.b));
 			if(nextTriplet.c != null) {
 				Node rightNode = new Node(nextTriplet.c);
+				rightNode.addBrother(leftNode);
 				node.addDaughter(rightNode);
 				buildChild(rightNode, new Triplet<Integer, Integer, String>(nextTriplet.a, triplet.b, nextTriplet.c));
 			}
