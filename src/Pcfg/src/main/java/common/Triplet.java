@@ -32,13 +32,12 @@ public class Triplet<A, B, C> {
 	
 	@Override
 	public int hashCode() {
-		return a.hashCode() + b.hashCode() + c.hashCode();
+		return (a == null ? 0 : a.hashCode()) + (b == null ? 0 : b.hashCode()) + (c == null ? 0 : c.hashCode());
 	}
-
 	@Override
 	public String toString() {
-		return new StringBuilder(getClass().getSimpleName()).append("[a=").append(a.toString()).append(", b=")
-				.append(b.toString()).append(", c=").append(c.toString()).append("]").toString();
+		return new StringBuilder(getClass().getSimpleName()).append("[a=").append(a).append(", b=")
+				.append(b).append(", c=").append(c).append("]").toString();
 	}
 
 }

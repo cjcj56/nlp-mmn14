@@ -80,7 +80,7 @@ public class CykMatrix {
 
 	public void setBackTrace(int row, int col, String lhsSymbol,
 			int childIdx, String rhsLeftSymbol, String rhsRightSymbol) {
-		backTrace.put(new Triplet<>(row, getRealColIdx(row, col), lhsSymbol), new Triplet<>(childIdx, rhsLeftSymbol, rhsRightSymbol));
+		backTrace.put(new Triplet<>(row, col, lhsSymbol), new Triplet<>(childIdx, rhsLeftSymbol, rhsRightSymbol));
 	}
 
 	public Tree buildTree(Set<String> startSymbols) {
@@ -103,7 +103,7 @@ public class CykMatrix {
 			return null;
 		}
 		
-		Triplet<Integer, Integer, String> rootTriplet = new Triplet<Integer, Integer, String>(0, n-1, startSymbol);  
+		Triplet<Integer, Integer, String> rootTriplet = new Triplet<Integer, Integer, String>(0, n, startSymbol);
 		
 		Node rootNode = new Node(TOP);
 		rootNode.setRoot(true);
@@ -125,11 +125,11 @@ public class CykMatrix {
 		} else {
 			Node leftNode = new Node(nextTriplet.b);
 			node.addDaughter(leftNode);
-			buildChild(leftNode, new Triplet<Integer, Integer, String>(triplet.a, getRealColIdx(triplet.a, nextTriplet.a), nextTriplet.b));
+			buildChild(leftNode, new Triplet<Integer, Integer, String>(triplet.a, nextTriplet.a, nextTriplet.b));
 			if(nextTriplet.c != null) {
 				Node rightNode = new Node(nextTriplet.c);
 				node.addDaughter(rightNode);
-				buildChild(rightNode, new Triplet<Integer, Integer, String>(nextTriplet.a, getRealColIdx(nextTriplet.a, triplet.b), nextTriplet.c));
+				buildChild(rightNode, new Triplet<Integer, Integer, String>(nextTriplet.a, triplet.b, nextTriplet.c));
 			}
 		}
 	}
