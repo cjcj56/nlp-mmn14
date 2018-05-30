@@ -23,10 +23,16 @@ public class Triplet<A, B, C> {
 		} else {
 			@SuppressWarnings("rawtypes")
 			Triplet other = (Triplet) obj;
-			return a == null ? other.a == null
-					: a.equals(other.a) && b == null ? other.b == null
-							: b.equals(other.b) && c == null ? other.c == null : c.equals(other.c);
+			boolean aEq = a == null ? other.a == null : a.equals(other.a);
+			boolean bEq = b == null ? other.b == null : b.equals(other.b);
+			boolean cEq = c == null ? other.c == null : c.equals(other.c);
+			return aEq && bEq && cEq;
 		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return a.hashCode() + b.hashCode() + c.hashCode();
 	}
 
 	@Override

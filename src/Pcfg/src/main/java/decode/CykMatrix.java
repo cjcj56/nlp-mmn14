@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import common.Triplet;
@@ -105,29 +104,26 @@ public class CykMatrix {
 			return null;
 		}
 		
-		Triplet<Integer, Integer, String> rootTriplet = new Triplet<Integer, Integer, String>(1, n, startSymbol);  
-		Triplet<Integer, String, String> nextTriplet = backTrace.get(rootTriplet);  
-		if(nextTriplet == null) {
-			return null;
-		}
+		Triplet<Integer, Integer, String> rootTriplet = new Triplet<Integer, Integer, String>(0, n-1, startSymbol);  
 		
 		Node rootNode = new Node(TOP);
 		Tree t = new Tree(rootNode);
-		buildChild(rootNode, new Triplet<>(rootTriplet.a, nextTriplet.a, nextTriplet.b));
-		buildChild(rootNode, new Triplet<>(nextTriplet.a, rootTriplet.b, nextTriplet.c));		
+		buildChild(rootNode, rootTriplet);
 		
 		return t;
 	}
 
 	private void buildChild(Node node, Triplet<Integer, Integer, String> triplet) {
 		Triplet<Integer, String, String> nextTriplet = backTrace.get(triplet);
-		if(! TERMINAL_TRIPLET.equals(nextTriplet)) {
+		if((nextTriplet != null) && (! TERMINAL_TRIPLET.equals(nextTriplet))) { // TODO : in what situation nextTriplet == null ??
 			Node leftNode = new Node(nextTriplet.b);
 			node.addDaughter(leftNode);
 			buildChild(leftNode, new Triplet<Integer, Integer, String>(triplet.a, nextTriplet.a, nextTriplet.b));
-			Node rightNode = new Node(nextTriplet.c);
-			node.addDaughter(rightNode);
-			buildChild(rightNode, new Triplet<Integer, Integer, String>(nextTriplet.a, triplet.b, nextTriplet.c));
+			if(nextTriplet.c != null) {
+				Node rightNode = new Node(nextTriplet.c);
+				node.addDaughter(rightNode);
+				buildChild(rightNode, new Triplet<Integer, Integer, String>(nextTriplet.a, triplet.b, nextTriplet.c));
+			}
 		}
 	}
 	

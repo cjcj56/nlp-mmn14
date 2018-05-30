@@ -1,13 +1,10 @@
 package parse;
 
-import static common.Consts.TOP;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -77,20 +74,6 @@ public class Parse {
 		// 3. train
 		LOGGER.info("training");
 		Grammar myGrammar = TrainCalculateProbs.getInstance().train(myTrainTreebank);
-
-		/*Set<Rule> rules = new HashSet<>();
-		rules.addAll(myGrammar.getLexicalRules());
-		rules.addAll(myGrammar.getSyntacticRules());
-		for(Rule rule : rules) {
-			if(rule.isTop()) {
-				System.out.println(rule.toString());
-			}
-			if(TOP.equals(rule.getLHS().getSymbols().get(0))) {
-				System.out.println(rule.toString());
-			}
-		}
-		System.out.println("end");
-		System.exit(999);*/
 		
 		// 4. decode
 		LOGGER.info("decoding");

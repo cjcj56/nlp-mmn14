@@ -71,7 +71,7 @@ public class Decode {
 				for (int k = i+1; k <= j-1; ++k) {
 //					System.out.format("j=%d, i=%d, k=%d, %s", j,i,k,System.lineSeparator());
 					if ((cyk.get(i, k) != null) && (cyk.get(k, j) != null)) {
-							for (Rule rule : m_setGrammarRules) {
+						for (Rule rule : m_setGrammarRules) {
 							Double currProb = cyk.get(i, j, rule.getLHS().getSymbols().get(0));
 							Double computedProb;
 							boolean unitRule = rule.isUnitRule(); 
