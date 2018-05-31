@@ -39,7 +39,7 @@ public class Parse {
 	
 	private static Logger LOGGER;
 //	public static final String LOG_CONF = "D:\\Limudim\\OpenU\\2018b_22933_IntroToNLP\\hw\\hw4\\workspace\\nlp-mmn14\\src\\Pcfg\\conf\\logging.properties";
-	public static final String LOG_CONF = "./conf/logging.properties";
+	public static final String LOG_CONF = "./src/Pcfg/conf/logging.properties";
 
 	public static void main(String[] args) {
 		
@@ -73,12 +73,8 @@ public class Parse {
 		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank, h);
 		writeParseTrees("TrainBinarizing", myTrainTreebank.getAnalyses());
 
-//		Treebank parseTest = TreebankReader.getInstance().read(true, "parseBinarizing.parsed");
-//		List<Tree> testTrees = TrainCalculateProbs.getInstance().deTransformTree(parseTest.getAnalyses());
-//		writeParseTrees("parseDeBinarizing2", testTrees);
-
-//		myTrainTreebank = ParentEncoding.getInstance().smooting(myTrainTreebank);
-//		writeParseTrees("TrainBinarizingWithSmooting", myTrainTreebank.getAnalyses());
+		myTrainTreebank = ParentEncoding.getInstance().smooting(myTrainTreebank);
+		writeParseTrees("TrainBinarizingWithSmooting", myTrainTreebank.getAnalyses());
 
 		// 3. train
 		LOGGER.info("training");
@@ -87,7 +83,7 @@ public class Parse {
 		// 4. decode
 		LOGGER.info("decoding");
 		Decode.getInstance(myGrammar); // populate Decode collections
-		boolean multithreaded = false;
+		boolean multithreaded = true;
 		int numOfThreads = multithreaded ? 20 : 1;
 		List<List<Integer>> partitionedRanges = ListPartitioner.partition(myGoldTreebank.size(), numOfThreads);
 		List<Tree> trees = myGoldTreebank.getAnalyses();
@@ -118,6 +114,9 @@ public class Parse {
 		for(List<Tree> threadOutput : threadsOutputs) {
 			parsedTrees.addAll(threadOutput);
 		}
+
+		//4.5. unSmooting parent
+		parsedTrees = ParentEncoding.getInstance().unSmooting(parsedTrees);
 
 		// 5. de-transform trees
 		writeParseTrees("parseBinarizing", parsedTrees);
