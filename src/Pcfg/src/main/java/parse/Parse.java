@@ -39,7 +39,7 @@ public class Parse {
 	
 	private static Logger LOGGER;
 //	public static final String LOG_CONF = "D:\\Limudim\\OpenU\\2018b_22933_IntroToNLP\\hw\\hw4\\workspace\\nlp-mmn14\\src\\Pcfg\\conf\\logging.properties";
-	public static final String LOG_CONF = "./conf/logging.properties";
+	public static final String LOG_CONF = "./src/Pcfg/conf/logging.properties";
 
 	public static void main(String[] args) {
 		
@@ -66,11 +66,16 @@ public class Parse {
 		LOGGER.info("reading train treebank");
 		Treebank myTrainTreebank = TreebankReader.getInstance().read(true, args[1]);
 		LOGGER.info("finished reading train treebank");
-		
+
+		int h=2;
 		// 2. transform trees
 		LOGGER.info("transforming to CNF");
-		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank, 1);
+		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank, h);
 		writeParseTrees("TrainBinarizing", myTrainTreebank.getAnalyses());
+
+//		Treebank parseTest = TreebankReader.getInstance().read(true, "parseBinarizing.parsed");
+//		List<Tree> testTrees = TrainCalculateProbs.getInstance().deTransformTree(parseTest.getAnalyses());
+//		writeParseTrees("parseDeBinarizing2", testTrees);
 
 //		myTrainTreebank = ParentEncoding.getInstance().smooting(myTrainTreebank);
 //		writeParseTrees("TrainBinarizingWithSmooting", myTrainTreebank.getAnalyses());
@@ -82,7 +87,7 @@ public class Parse {
 		// 4. decode
 		LOGGER.info("decoding");
 		Decode.getInstance(myGrammar); // populate Decode collections
-		boolean multithreaded = false;
+		boolean multithreaded = true;
 		int gridSize = multithreaded ? 25 : myGoldTreebank.size();
 		Map<Integer, Integer> partitionedRanges = ListPartitioner.partition(myGoldTreebank.size(), gridSize);
 		List<Tree> trees = myGoldTreebank.getAnalyses();
@@ -120,7 +125,7 @@ public class Parse {
 		writeParseTrees("parseDeBinarizing", parsedTrees);
 
 		// 6. write output
-		writeOutput(args[2], myGrammar, parsedTrees);	
+		writeOutput(args[2]+"_"+h, myGrammar, parsedTrees);
 	}
 	
 	
