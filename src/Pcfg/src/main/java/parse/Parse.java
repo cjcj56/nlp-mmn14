@@ -39,7 +39,7 @@ public class Parse {
 	
 	private static Logger LOGGER;
 //	public static final String LOG_CONF = "D:\\Limudim\\OpenU\\2018b_22933_IntroToNLP\\hw\\hw4\\workspace\\nlp-mmn14\\src\\Pcfg\\conf\\logging.properties";
-	public static final String LOG_CONF = "./src/Pcfg/conf/logging.properties";
+	public static final String LOG_CONF = "./conf/logging.properties";
 
 	public static void main(String[] args) {
 		
@@ -67,7 +67,7 @@ public class Parse {
 		Treebank myTrainTreebank = TreebankReader.getInstance().read(true, args[1]);
 		LOGGER.info("finished reading train treebank");
 
-		int h=2;
+		int h=0;
 		// 2. transform trees
 		LOGGER.info("transforming to CNF");
 		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank, h);
@@ -88,14 +88,14 @@ public class Parse {
 		LOGGER.info("decoding");
 		Decode.getInstance(myGrammar); // populate Decode collections
 		boolean multithreaded = true;
-		int gridSize = multithreaded ? 25 : myGoldTreebank.size();
-		Map<Integer, Integer> partitionedRanges = ListPartitioner.partition(myGoldTreebank.size(), gridSize);
+		int numOfThreads = multithreaded ? 20 : myGoldTreebank.size();
+		List<List<Integer>> partitionedRanges = ListPartitioner.partition(myGoldTreebank.size(), numOfThreads);
 		List<Tree> trees = myGoldTreebank.getAnalyses();
 		List<List<Tree>> threadsOutputs = new ArrayList<>(partitionedRanges.size());
 		List<Thread> threads = new ArrayList<>(partitionedRanges.size());
-		for(Map.Entry<Integer, Integer> range : partitionedRanges.entrySet()) {
-			int start = range.getKey();
-			int end = range.getValue();
+		for(List<Integer> range : partitionedRanges) {
+			int start = range.get(0);
+			int end = range.get(1);
 			String threadRange = String.format("(%d,%d)", start, end-1);
 			List<Tree> threadOutput = new ArrayList<>();
 			Thread thread = new Thread(new DecodeRunnable(trees.subList(start, end), threadOutput), threadRange);

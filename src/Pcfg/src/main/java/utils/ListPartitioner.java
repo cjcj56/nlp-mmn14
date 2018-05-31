@@ -1,20 +1,22 @@
 package utils;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ListPartitioner {
 	
-	public static Map<Integer, Integer> partition(int items, int gridSize) {
-		int numOfPartitions = (int)(items / gridSize);
-		Map<Integer, Integer> partitionedItems = new HashMap<>();
-		for (int i = 0; i < numOfPartitions; ++i) {
-			partitionedItems.put(i*numOfPartitions, i*numOfPartitions + gridSize);
+	public static List<List<Integer>> partition(int items, int numOfThreads) {
+		assert items >= numOfThreads;
+		int gridSize = Math.floorDiv(items, numOfThreads);
+		int remainder = items % numOfThreads;
+		List<List<Integer>> partitionedItems = new ArrayList<>(numOfThreads);
+		for (int i = 0; i < numOfThreads; ++i) {
+			int assignedRemainders = Math.min(remainder, i);
+			List<Integer> range = Arrays.asList(i*gridSize + assignedRemainders, i*gridSize + assignedRemainders + gridSize + (i < remainder ? 1 : 0));
+			partitionedItems.add(range);
 		}
-		if(items % gridSize > 0) {
-			int lastPartitionSize = numOfPartitions * gridSize - items;
-			partitionedItems.put(items - lastPartitionSize, lastPartitionSize);
-		}
+
 		return partitionedItems;
 	}
 
