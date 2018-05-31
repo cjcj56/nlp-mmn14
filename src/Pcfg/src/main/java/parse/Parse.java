@@ -87,8 +87,8 @@ public class Parse {
 		// 4. decode
 		LOGGER.info("decoding");
 		Decode.getInstance(myGrammar); // populate Decode collections
-		boolean multithreaded = true;
-		int numOfThreads = multithreaded ? 20 : myGoldTreebank.size();
+		boolean multithreaded = false;
+		int numOfThreads = multithreaded ? 20 : 1;
 		List<List<Integer>> partitionedRanges = ListPartitioner.partition(myGoldTreebank.size(), numOfThreads);
 		List<Tree> trees = myGoldTreebank.getAnalyses();
 		List<List<Tree>> threadsOutputs = new ArrayList<>(partitionedRanges.size());
