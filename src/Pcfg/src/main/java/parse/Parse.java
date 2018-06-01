@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -38,9 +37,14 @@ public class Parse {
 	 */
 	
 	private static Logger LOGGER;
-//	public static final String LOG_CONF = "D:\\Limudim\\OpenU\\2018b_22933_IntroToNLP\\hw\\hw4\\workspace\\nlp-mmn14\\src\\Pcfg\\conf\\logging.properties";
-	public static final String LOG_CONF = "./src/Pcfg/conf/logging.properties";
+//	public static final String LOG_CONF = "./src/Pcfg/conf/logging.properties";
+	public static final String LOG_CONF = "./conf/logging.properties";
+	
+	public static int numOfThreads = 10;
+	public static int h = 0;
+	public static boolean multithreaded = false;
 
+	
 	public static void main(String[] args) {
 		
 		//**************************//
@@ -67,7 +71,7 @@ public class Parse {
 		Treebank myTrainTreebank = TreebankReader.getInstance().read(true, args[1]);
 		LOGGER.info("finished reading train treebank");
 
-		int h=0;
+		int h=2;
 		// 2. transform trees
 		LOGGER.info("transforming to CNF");
 		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank, h);
@@ -83,8 +87,7 @@ public class Parse {
 		// 4. decode
 		LOGGER.info("decoding");
 		Decode.getInstance(myGrammar); // populate Decode collections
-		boolean multithreaded = true;
-		int numOfThreads = multithreaded ? 20 : 1;
+		numOfThreads = multithreaded ? 20 : 1;
 		List<List<Integer>> partitionedRanges = ListPartitioner.partition(myGoldTreebank.size(), numOfThreads);
 		List<Tree> trees = myGoldTreebank.getAnalyses();
 		List<List<Tree>> threadsOutputs = new ArrayList<>(partitionedRanges.size());

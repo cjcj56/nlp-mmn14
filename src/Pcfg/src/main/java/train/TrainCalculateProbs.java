@@ -44,15 +44,14 @@ public class TrainCalculateProbs extends Train {
 
     public Grammar train(Treebank treebank) {
         preProcess(treebank);
+        
         Grammar grammar = super.train(treebank);
 
         for (Rule rule : grammar.getLexicalRules()) {
-            rule.setMinusLogProb(calculateProbs(grammar.getRuleCounts().get(rule),
-                    grammar.getNonTerminalSymbolsCounts().get(rule.getLHS().getSymbols().get(0))));
+            rule.setMinusLogProb(calculateRuleProbs(grammar, rule));
         }
         for (Rule rule : grammar.getSyntacticRules()) {
-            rule.setMinusLogProb(calculateProbs(grammar.getRuleCounts().get(rule),
-                    grammar.getNonTerminalSymbolsCounts().get(rule.getLHS().getSymbols().get(0))));
+            rule.setMinusLogProb(calculateRuleProbs(grammar, rule));
         }
         return grammar;
     }
@@ -63,6 +62,11 @@ public class TrainCalculateProbs extends Train {
     }
 
     private void smoothInfrequentWords(Treebank treebank) {
+    	smoothInfrequentWords(treebank, INFREQUENT_WORD_THRESH);
+    }
+    
+	private void smoothInfrequentWords(Treebank treebank, int infrequentWordThresh) {
+		// 1. Count words
         CountMap<String> wordsCount = new CountMap<>();
         for (Tree tree : treebank.getAnalyses()) {
             for (Terminal terminal : tree.getTerminals()) {
@@ -70,13 +74,15 @@ public class TrainCalculateProbs extends Train {
             }
         }
 
+        // 2. collect infrewuent words
         Set<String> infrequentWords = new HashSet<>();
         for (Map.Entry<String, Integer> wordCount : wordsCount.entrySet()) {
-            if (wordCount.getValue() <= INFREQUENT_WORD_THRESH) {
+            if (wordCount.getValue() <= infrequentWordThresh) {
                 infrequentWords.add(wordCount.getKey());
             }
         }
 
+        // 3. transform infrequent words of input to UNK
         for (Tree tree : treebank.getAnalyses()) {
             for (Terminal terminal : tree.getTerminals()) {
                 if (infrequentWords.contains(terminal.getIdentifier())) {
@@ -86,7 +92,9 @@ public class TrainCalculateProbs extends Train {
         }
     }
 
-    public double calculateProbs(int countRules, double countTerminal) {
+    public double calculateRuleProbs(Grammar grammar, Rule rule) {
+    	int countRules = grammar.getRuleCounts().get(rule);
+    	double countTerminal = grammar.getNonTerminalSymbolsCounts().get(rule.getLHS().getSymbols().get(0));
         return (Math.log(countRules / countTerminal));
     }
 
@@ -100,6 +108,18 @@ public class TrainCalculateProbs extends Train {
         return myTreebank;
     }
 
+    /*private void updateNode2(Node node, List<Node> brothers) {
+    	List<Node> daughters = node.getDaughters();
+    	if(daughters.size() > 2) {
+    		Node daughter1 = daughters.get(0);
+    		Node daughter2 = concatNodes(node.getDaughters().subList(1, node.))
+    	} else {
+    		for(Node daughter : daughters) {
+    			updateNode2(daughter);
+    		}
+    	}
+    }*/
+    
     private Node updateNode(Node node) {
         if (node.getDaughters().size() > 2) {
             Node newNode = (Node) node.clone();
