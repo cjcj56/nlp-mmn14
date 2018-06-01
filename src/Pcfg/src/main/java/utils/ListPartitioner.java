@@ -7,7 +7,9 @@ import java.util.List;
 public class ListPartitioner {
 	
 	public static List<List<Integer>> partition(int items, int numOfThreads) {
-		assert items >= numOfThreads;
+		if(items < numOfThreads) {
+			numOfThreads = items;
+		}
 		int gridSize = Math.floorDiv(items, numOfThreads);
 		int remainder = items % numOfThreads;
 		List<List<Integer>> partitionedItems = new ArrayList<>(numOfThreads);

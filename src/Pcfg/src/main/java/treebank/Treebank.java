@@ -2,7 +2,11 @@ package treebank;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
+import common.Triplet;
+import tree.ArtificialNodeCreator;
+import tree.SimpleAritificialNodeCreator;
 import tree.Tree;
 
 
@@ -18,11 +22,20 @@ import tree.Tree;
  */
 public class Treebank {
 
+	private static final Logger LOGGER = Logger.getLogger(Treebank.class.getName());
+	
 	protected List<Tree> m_lstAnalyses = new ArrayList<Tree>();
 	
 	public Treebank() {
 		super();
 	}
+	
+	public Treebank(List<Tree> trees) {
+		super();
+		m_lstAnalyses = trees;
+	}
+	
+	
 
 	public void add(Tree pt){
 		getAnalyses().add(pt);		
@@ -37,6 +50,27 @@ public class Treebank {
 		return m_lstAnalyses;
 	}
 	
+	
+	public void toCnf() {
+		toCnf(0);
+	}
+	
+	public void toCnf(int h) {
+		toCnf(new SimpleAritificialNodeCreator(h));
+	}
+	
+	public void toCnf(ArtificialNodeCreator artificialNodeCreator) {
+		for(Tree tree : getAnalyses()) {
+			tree.toCnf(artificialNodeCreator);
+		}
+	}
+	
+	public void deCnf() {
+		for(Tree tree : getAnalyses()) {
+			tree.deCnf();
+		}
+	}
+	
 	public String toString()
 	{
 		StringBuffer sb = new StringBuffer();
@@ -47,6 +81,34 @@ public class Treebank {
 		}
 		
 		return sb.toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		} else if (this == obj) {
+			return true;
+		} else if (!getClass().equals(obj.getClass())) {
+			return false;
+		} else {
+			Treebank otherTb = (Treebank) obj;
+			if(getAnalyses().size() != otherTb.getAnalyses().size()) {
+				return false;
+			} else {
+				List<Tree> tb1 = getAnalyses();
+				List<Tree> tb2 = otherTb.getAnalyses();
+				for(int i = 0; i < tb1.size(); ++i) {
+					Tree tree1 = tb1.get(i);
+					Tree tree2 = tb2.get(i);
+					if(!tree1.equals(tree2)) {
+						LOGGER.fine("tree #" + i + "is diffrent!");
+						return false;
+					}
+				}
+				return true;
+			}
+		}
 	}
 	
 	

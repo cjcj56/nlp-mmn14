@@ -40,9 +40,9 @@ public class Parse {
 //	public static final String LOG_CONF = "./src/Pcfg/conf/logging.properties";
 	public static final String LOG_CONF = "./conf/logging.properties";
 	
-	public static int numOfThreads = 10;
-	public static int h = 0;
-	public static boolean multithreaded = false;
+	public static int numOfThreads = 20;
+	public static int h = 2;
+	public static boolean multithreaded = true;
 
 	
 	public static void main(String[] args) {
@@ -61,6 +61,7 @@ public class Parse {
 		
 		// 0. initialize
 		initLogging(LOG_CONF);
+		LOGGER = Logger.getLogger(Parse.class.getName());
 		
 		// 1. read input
 		LOGGER.fine("args: " + Arrays.toString(args));
@@ -71,7 +72,6 @@ public class Parse {
 		Treebank myTrainTreebank = TreebankReader.getInstance().read(true, args[1]);
 		LOGGER.info("finished reading train treebank");
 
-		int h=2;
 		// 2. transform trees
 		LOGGER.info("transforming to CNF");
 		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank, h);
@@ -87,7 +87,7 @@ public class Parse {
 		// 4. decode
 		LOGGER.info("decoding");
 		Decode.getInstance(myGrammar); // populate Decode collections
-		numOfThreads = multithreaded ? 20 : 1;
+		numOfThreads = multithreaded ? numOfThreads : 1;
 		List<List<Integer>> partitionedRanges = ListPartitioner.partition(myGoldTreebank.size(), numOfThreads);
 		List<Tree> trees = myGoldTreebank.getAnalyses();
 		List<List<Tree>> threadsOutputs = new ArrayList<>(partitionedRanges.size());
@@ -134,8 +134,6 @@ public class Parse {
 	private static void initLogging(String logConf) {
 		try {
             LogManager.getLogManager().readConfiguration(new FileInputStream(logConf));
-            LOGGER = Logger.getLogger(Parse.class.getName());
-            LOGGER.info("Logging initiated");
         } catch (SecurityException | IOException e) {
             e.printStackTrace();
         }
