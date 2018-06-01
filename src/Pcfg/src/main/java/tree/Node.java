@@ -39,9 +39,15 @@ public class Node {
 
     // parent node
     private Node m_nodeParent = null;
+    
+    // real parent (for trees transformed to cnf)
+    private Node m_nodeRealParent = null;
 
     // marks a root node
     private boolean m_bRoot = false;
+    
+    // marks an artificial node
+    private boolean m_bArtificial = false;
 
     // marks a node with a String identifier,
     private String m_sIdentifier = null;
@@ -68,6 +74,7 @@ public class Node {
         Node n = new Node(getIdentifier());
 
         n.setRoot(isRoot());
+        n.setRealParent(getRealParent());
 
         for (int i = 0; i < getDaughters().size(); i++) {
             if (getDaughters().get(i) instanceof Terminal) {
@@ -102,6 +109,7 @@ public class Node {
     }
 
     public void setParent(Node mNodeParent) {
+    	m_nodeRealParent = mNodeParent;
         m_nodeParent = mNodeParent;
     }
 
@@ -285,10 +293,7 @@ public class Node {
     }
 
     public boolean isBrother() {
-        if(this.getBrothers().size() == 0){
-            return false;
-        }
-        return true;
+        return ! getBrothers().isEmpty();
     }
 
     public void cloneBrothers(Node node) {
@@ -297,4 +302,54 @@ public class Node {
             this.addBrother(nb);
         }
     }
+    
+    public void setDaughters(List<Node> daughters) {
+    	this.m_lstDaughters = daughters;
+    }
+    
+    public void setSisters(List<Node> sisters) {
+    	this.m_lstBrothers = sisters;
+    }
+    
+    public void addSisters(List<Node> sisters) {
+    	this.m_lstBrothers.addAll(sisters);
+    }
+    
+    public void addSister(Node sister) {
+    	this.m_lstBrothers.add(sister);
+    }
+    
+    public List<Node> getSisters() {
+    	return this.m_lstBrothers;
+    }
+    
+    public void setRealParent(Node realParentNode) {
+    	this.m_nodeRealParent = realParentNode;
+    }
+    
+    public Node getRealParent() {
+    	return this.m_nodeRealParent;
+    }
+    
+    public void setAritificial(boolean isArtificial) {
+    	this.m_bArtificial = isArtificial;
+    }
+    
+    public boolean isArtificial() {
+    	return m_bArtificial;
+    }
+    
+    @Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		} else if (this == obj) {
+			return true;
+		} else if (!getClass().equals(obj.getClass())) {
+			return false;
+		} else {
+			Node otherNode = (Node) obj;
+			return getIdentifier().equals(otherNode.getIdentifier());
+		}
+	}
 }

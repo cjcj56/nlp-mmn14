@@ -6,6 +6,7 @@ import static common.Consts.UNK;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import grammar.Grammar;
 import grammar.Rule;
@@ -29,6 +30,8 @@ import java.util.List;
 
 public class TrainCalculateProbs extends Train {
 
+	private static final Logger LOGGER = Logger.getLogger(TrainCalculateProbs.class.getName());
+	
     public static TrainCalculateProbs m_singTrainerCalc = null;
 
     public static TrainCalculateProbs getInstance() {
@@ -57,6 +60,7 @@ public class TrainCalculateProbs extends Train {
     }
 
     private void preProcess(Treebank treebank) {
+    	LOGGER.fine("preprocessing input");
         smoothInfrequentWords(treebank);
 
     }
@@ -66,7 +70,9 @@ public class TrainCalculateProbs extends Train {
     }
     
 	private void smoothInfrequentWords(Treebank treebank, int infrequentWordThresh) {
-		// 1. Count words
+		LOGGER.fine("smoothing infrequent words");
+		
+		LOGGER.finer("counting words in input");
         CountMap<String> wordsCount = new CountMap<>();
         for (Tree tree : treebank.getAnalyses()) {
             for (Terminal terminal : tree.getTerminals()) {
@@ -74,7 +80,7 @@ public class TrainCalculateProbs extends Train {
             }
         }
 
-        // 2. collect infrewuent words
+        LOGGER.finer("collecting infrequent words from input");
         Set<String> infrequentWords = new HashSet<>();
         for (Map.Entry<String, Integer> wordCount : wordsCount.entrySet()) {
             if (wordCount.getValue() <= infrequentWordThresh) {
@@ -82,7 +88,7 @@ public class TrainCalculateProbs extends Train {
             }
         }
 
-        // 3. transform infrequent words of input to UNK
+        LOGGER.finer("transforming infrequent words of input to " + UNK);
         for (Tree tree : treebank.getAnalyses()) {
             for (Terminal terminal : tree.getTerminals()) {
                 if (infrequentWords.contains(terminal.getIdentifier())) {
@@ -108,18 +114,6 @@ public class TrainCalculateProbs extends Train {
         return myTreebank;
     }
 
-    /*private void updateNode2(Node node, List<Node> brothers) {
-    	List<Node> daughters = node.getDaughters();
-    	if(daughters.size() > 2) {
-    		Node daughter1 = daughters.get(0);
-    		Node daughter2 = concatNodes(node.getDaughters().subList(1, node.))
-    	} else {
-    		for(Node daughter : daughters) {
-    			updateNode2(daughter);
-    		}
-    	}
-    }*/
-    
     private Node updateNode(Node node) {
         if (node.getDaughters().size() > 2) {
             Node newNode = (Node) node.clone();

@@ -1,11 +1,14 @@
 package decode;
 
+import static common.Consts.DEFAULT_SYM;
+
 import grammar.Grammar;
 import grammar.Rule;
 
 import static common.Consts.UNK;
 import static java.lang.Double.NEGATIVE_INFINITY;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +22,7 @@ public class Decode {
 
 	public static Set<String> m_setStartSymbols = null;
 	public static Set<Rule> m_setGrammarRules = null;
+	public static Set<Rule> m_setLexicalRules = null;
 	public static Map<String, Set<Rule>> m_mapLexicalRules = null;
 
 	/**
@@ -31,6 +35,7 @@ public class Decode {
 		if (m_singDecoder == null) {
 			m_singDecoder = new Decode();
 			m_setStartSymbols = g.getStartSymbols();
+			m_setLexicalRules = g.getLexicalRules();
 			m_setGrammarRules = g.getSyntacticRules();
 			m_mapLexicalRules = g.getLexicalEntries();
 		}
@@ -59,10 +64,11 @@ public class Decode {
 		CykMatrix cyk = new CykMatrix(input.size());
 		for (int j = 1; j <= cyk.n(); ++j) {
 			String word = input.get(j-1);
-			if (!m_mapLexicalRules.containsKey(word)) {
-				word = UNK;
+			Set<Rule> wordLexicalRules = m_mapLexicalRules.get(word);
+			if (wordLexicalRules == null) {
+				wordLexicalRules = m_mapLexicalRules.get(UNK);
 			}
-			for (Rule rule : m_mapLexicalRules.get(word)) {
+			for (Rule rule : wordLexicalRules) {
 				cyk.set(j-1, j, rule.getLHS().getSymbols().get(0), rule.getMinusLogProb());
 				cyk.setBackTrace(j-1, j, rule.getLHS().getSymbols().get(0), -1, input.get(j-1), null);
 			}
