@@ -41,7 +41,7 @@ public class Parse {
 	public static final String LOG_CONF = "./conf/logging.properties";
 	
 	public static int numOfThreads = 20;
-	public static int h = 2;
+	public static int h = 1;
 	public static boolean multithreaded = true;
 	public static boolean trainOnGold = false; // for debugging, runs much faster
 
