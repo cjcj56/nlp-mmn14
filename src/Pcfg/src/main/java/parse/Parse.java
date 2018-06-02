@@ -120,7 +120,7 @@ public class Parse {
 		Treebank parsedTreebank = new Treebank(parsedTrees);
 
 		//4.5. unSmooting parent
-		parsedTreebank = ParentEncoding.getInstance().unSmooting(parsedTreebank);
+//		parsedTreebank = ParentEncoding.getInstance().unSmooting(parsedTreebank);
 
 		// 5. de-transform trees
 		writeParseTrees("parseBinarizing", parsedTreebank.getAnalyses());

@@ -63,7 +63,7 @@ public class TrainCalculateProbs extends Train {
     private void preProcess(Treebank treebank) {
     	LOGGER.fine("preprocessing input");
         smoothInfrequentWords(treebank);
-        treebank = ParentEncoding.getInstance().smooting(treebank);
+//        treebank = ParentEncoding.getInstance().smooting(treebank);
 		Parse.writeParseTrees("TrainBinarizingWithSmooting", treebank.getAnalyses());
 
     }

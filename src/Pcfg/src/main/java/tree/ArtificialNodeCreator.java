@@ -12,7 +12,7 @@ public interface ArtificialNodeCreator {
 	static String nodeIdJoiner(List<Node> nodes, Node parent) {
 		StringBuilder sb = new StringBuilder();
 		if(nodes.isEmpty()) {
-			return addParentDel ? sb.append(NO_NODE_SYM).append(PARENT_DEL).append(parent).toString();
+			return sb.append(NO_NODE_SYM).append(PARENT_DEL).append(parent).toString();
 		}
 		Iterator<Node> nodesIterator = nodes.iterator();
 		for(Node node = nodesIterator.next(); nodesIterator.hasNext();) {
