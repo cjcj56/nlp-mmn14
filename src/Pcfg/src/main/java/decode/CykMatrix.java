@@ -1,5 +1,6 @@
 package decode;
 
+import static common.Consts.PARENT_DEL;
 import static common.Consts.TOP;
 import static java.lang.Double.NEGATIVE_INFINITY;
 
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import common.Consts;
 import common.Triplet;
 import tree.Node;
 import tree.Terminal;
@@ -103,7 +105,7 @@ public class CykMatrix {
 			return null;
 		}
 		
-		Triplet<Integer, Integer, String> rootTriplet = new Triplet<Integer, Integer, String>(0, n, startSymbol);
+		Triplet<Integer, Integer, String> rootTriplet = new Triplet<>(0, n, startSymbol);
 		
 		Node rootNode = new Node(TOP);
 		rootNode.setRoot(true);
@@ -128,7 +130,7 @@ public class CykMatrix {
 			buildChild(leftNode, new Triplet<Integer, Integer, String>(triplet.a, nextTriplet.a, nextTriplet.b));
 			if(nextTriplet.c != null) {
 				Node rightNode = new Node(nextTriplet.c);
-				if(rightNode.getIdentifier().contains("@")) {
+				if(rightNode.isArtificial()) { // only right nodes are artificial
 					rightNode.addBrother(leftNode);
 				}
 				node.addDaughter(rightNode);

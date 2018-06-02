@@ -75,56 +75,58 @@ public class Tree {
 	}
 
 	public void toCnf() {
-		toCnf(getRoot(), getRoot(), new SimpleAritificialNodeCreator(0));
-	}
-	
-	public void toCnf(ArtificialNodeCreator artificialNodeCreator) {
-		toCnf(getRoot(), getRoot(), artificialNodeCreator);
+		toCnf(getRoot(), new SimpleAritificialNodeCreator(0));
 	}
 
-	private void toCnf(Node node, Node realParent, ArtificialNodeCreator artificialNodeCreator) {
-		if(true) {
-			throw new IllegalAccessError("NotImplmenented!");
-		}
+	public void toCnf(ArtificialNodeCreator artificialNodeCreator) {
+		toCnf(getRoot(), artificialNodeCreator);
+	}
+
+	private void toCnf(Node node, ArtificialNodeCreator artificialNodeCreator) {
+		/*
+		 * if(true) { throw new IllegalAccessError("NotImplmenented!"); }
+		 */
 		List<Node> daughters = node.getDaughters(); // initialized at creation time, assuming never null
-		if (daughters.size() <= 2) {
-			for (Node daughter : daughters) {
-				daughter.setParent(node);
-				daughter.setRealParent(realParent);
-				toCnf(daughter, node.isArtificial() ? realParent : node, artificialNodeCreator);
+		if (!daughters.isEmpty()) {
+			toCnf(daughters.get(0), artificialNodeCreator);
+			if (daughters.size() > 2) {
+				List<Node> redundantDaugthers = new ArrayList<>(daughters.subList(1, daughters.size()));
+				daughters.removeAll(redundantDaugthers);
+				Node newDaughter = artificialNodeCreator.createArtificialNode(redundantDaugthers, node);
 			}
-		} else if (daughters.size() > 2) {
-			List<Node> redundantDaugthers = daughters.subList(1, daughters.size());
-			Node newDaughter = artificialNodeCreator.createArtificialNode(redundantDaugthers, node);
-			toCnf(newDaughter, node.isArtificial() ? realParent : node, artificialNodeCreator);
+			if(daughters.size() == 2) {
+				toCnf(daughters.get(1), artificialNodeCreator);
+			}
 		}
 	}
 
 	public void deCnf() {
 		deCnf(getRoot());
 	}
-	
-	public void deCnf(Node node) {
-		throw new IllegalAccessError("NotImplmenented!");
-	}
-	
-	public void deCnfFromPreviousState() {
-		deCnfFromPreviousState(getRoot());
-	}
 
-	private void deCnfFromPreviousState(Node node) {
-		if(true) {
-			throw new IllegalAccessError("NotImplmenented!");
-		}
-		List<Node> daughters = node.getRealParent() == null ? null : node.getRealParent().getDaughters();
-		if(daughters != null) {
-			if (daughters.contains(node)) {
-				node.setParent(node.getRealParent()); // this is probably redundant
-			} else {
-				node.getRealParent().addDaughter(node); // automatically sets parent
+	private void deCnf(Node node) {
+		/*
+		 * if(true) { throw new IllegalAccessError("NotImplmenented!"); }
+		 */
+		List<Node> daughters = node.getDaughters();
+		if ((daughters != null) && (!daughters.isEmpty())) {
+			if (daughters.size() > 1) {
+				Node rightDughter = daughters.get(1);
+				while (rightDughter.isArtificial()) {
+					node.addDaughters(rightDughter.getDaughters());
+					rightDughter = daughters.get(daughters.size() - 1);
+				}
 			}
-			for (Node daughter : node.getDaughters()) {
-				deCnfFromPreviousState(daughter);
+			
+			int i = 0;
+			while(i < daughters.size()) {
+				Node daughter = daughters.get(i);
+				if (daughter.isArtificial()) {
+					daughters.remove(i);
+				} else {
+					deCnf(daughter);
+					++i;
+				}
 			}
 		}
 	}

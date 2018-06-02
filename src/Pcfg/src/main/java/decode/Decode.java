@@ -1,13 +1,12 @@
 package decode;
 
+import static common.Consts.UNK;
 import static common.Consts.DEFAULT_SYM;
+import static common.Consts.PARENT_ENCODING;
+import static java.lang.Double.NEGATIVE_INFINITY;
 
 import grammar.Grammar;
 import grammar.Rule;
-
-import static common.Consts.UNK;
-import static java.lang.Double.NEGATIVE_INFINITY;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -26,11 +25,10 @@ public class Decode {
 	public static Map<String, Set<Rule>> m_mapLexicalRules = null;
 
 	/**
-	 * Implementation of a singleton pattern
-	 * Avoids redundant instances in memory
+	 * Implementation of a singleton pattern Avoids redundant instances in memory
 	 */
 	public static Decode m_singDecoder = null;
-	
+
 	public static Decode getInstance(Grammar g) {
 		if (m_singDecoder == null) {
 			m_singDecoder = new Decode();
@@ -67,6 +65,11 @@ public class Decode {
 			Set<Rule> wordLexicalRules = m_mapLexicalRules.get(word);
 			if (wordLexicalRules == null) {
 				wordLexicalRules = m_mapLexicalRules.get(UNK);
+				if(wordLexicalRules == null) { // ParentEncoding applied
+					// assuming that there are unknown nouns (i.e. "UNK#NN#")
+					wordLexicalRules = m_mapLexicalRules.get(new StringBuilder(UNK).append(PARENT_ENCODING)
+							.append(DEFAULT_SYM).append(PARENT_ENCODING).toString());
+				}
 			}
 			for (Rule rule : wordLexicalRules) {
 				cyk.set(j-1, j, rule.getLHS().getSymbols().get(0), rule.getMinusLogProb());
@@ -104,5 +107,5 @@ public class Decode {
 		Tree cykTree = cyk.buildTree(m_setStartSymbols);
 		return cykTree != null ? cykTree : t;
 	}
-	
+
 }

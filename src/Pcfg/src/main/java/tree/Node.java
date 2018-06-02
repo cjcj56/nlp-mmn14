@@ -1,5 +1,7 @@
 package tree;
 
+import static common.Consts.ARTIFICIAL_MARKER;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -40,15 +42,9 @@ public class Node {
     // parent node
     private Node m_nodeParent = null;
     
-    // real parent (for trees transformed to cnf)
-    private Node m_nodeRealParent = null;
-
     // marks a root node
     private boolean m_bRoot = false;
     
-    // marks an artificial node
-    private boolean m_bArtificial = false;
-
     // marks a node with a String identifier,
     private String m_sIdentifier = null;
 
@@ -72,9 +68,7 @@ public class Node {
 
     public Object clone() {
         Node n = new Node(getIdentifier());
-
         n.setRoot(isRoot());
-        n.setRealParent(getRealParent());
 
         for (int i = 0; i < getDaughters().size(); i++) {
             if (getDaughters().get(i) instanceof Terminal) {
@@ -103,13 +97,18 @@ public class Node {
         nDaughter.setParent(this);
         return m_lstDaughters.add(nDaughter);
     }
+    
+    public void addDaughters(List<Node> nodes) {
+    	for (Node node : nodes) {
+    		addDaughter(node);
+    	}
+    }
 
     public Node getParent() {
         return m_nodeParent;
     }
 
     public void setParent(Node mNodeParent) {
-    	m_nodeRealParent = mNodeParent;
         m_nodeParent = mNodeParent;
     }
 
@@ -323,20 +322,8 @@ public class Node {
     	return this.m_lstBrothers;
     }
     
-    public void setRealParent(Node realParentNode) {
-    	this.m_nodeRealParent = realParentNode;
-    }
-    
-    public Node getRealParent() {
-    	return this.m_nodeRealParent;
-    }
-    
-    public void setAritificial(boolean isArtificial) {
-    	this.m_bArtificial = isArtificial;
-    }
-    
     public boolean isArtificial() {
-    	return m_bArtificial;
+    	return getIdentifier().contains(ARTIFICIAL_MARKER);
     }
     
     @Override

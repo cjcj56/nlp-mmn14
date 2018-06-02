@@ -43,6 +43,7 @@ public class Parse {
 	public static int numOfThreads = 20;
 	public static int h = 2;
 	public static boolean multithreaded = true;
+	public static boolean trainOnGold = false; // for debugging, runs much faster
 
 	
 	public static void main(String[] args) {
@@ -62,34 +63,33 @@ public class Parse {
 		// 0. initialize
 		initLogging(LOG_CONF);
 		LOGGER = Logger.getLogger(Parse.class.getName());
+		args[1] = trainOnGold ? args[0] : args[1];
 		
 		// 1. read input
 		LOGGER.fine("args: " + Arrays.toString(args));
 		LOGGER.info("reading gold treebank");
-		Treebank myGoldTreebank = TreebankReader.getInstance().read(true, args[0]);
+		Treebank goldTreebank = TreebankReader.getInstance().read(true, args[0]);
 		LOGGER.info("finished reading gold treebank");
 		LOGGER.info("reading train treebank");
-		Treebank myTrainTreebank = TreebankReader.getInstance().read(true, args[1]);
+		Treebank trainTreebank = TreebankReader.getInstance().read(true, args[1]);
 		LOGGER.info("finished reading train treebank");
 
 		// 2. transform trees
 		LOGGER.info("transforming to CNF");
-		myTrainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(myTrainTreebank, h);
-		writeParseTrees("TrainBinarizing", myTrainTreebank.getAnalyses());
-
-		myTrainTreebank = ParentEncoding.getInstance().smooting(myTrainTreebank);
-		writeParseTrees("TrainBinarizingWithSmooting", myTrainTreebank.getAnalyses());
+		trainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(trainTreebank, h);
+//		trainTreebank.toCnf();
+		writeParseTrees("TrainBinarizing", trainTreebank.getAnalyses());
 
 		// 3. train
 		LOGGER.info("training");
-		Grammar myGrammar = TrainCalculateProbs.getInstance().train(myTrainTreebank);
+		Grammar myGrammar = TrainCalculateProbs.getInstance().train(trainTreebank);
 		
 		// 4. decode
 		LOGGER.info("decoding");
 		Decode.getInstance(myGrammar); // populate Decode collections
 		numOfThreads = multithreaded ? numOfThreads : 1;
-		List<List<Integer>> partitionedRanges = ListPartitioner.partition(myGoldTreebank.size(), numOfThreads);
-		List<Tree> trees = myGoldTreebank.getAnalyses();
+		List<List<Integer>> partitionedRanges = ListPartitioner.partition(goldTreebank.size(), numOfThreads);
+		List<Tree> trees = goldTreebank.getAnalyses();
 		List<List<Tree>> threadsOutputs = new ArrayList<>(partitionedRanges.size());
 		List<Thread> threads = new ArrayList<>(partitionedRanges.size());
 		for(List<Integer> range : partitionedRanges) {
@@ -117,17 +117,19 @@ public class Parse {
 		for(List<Tree> threadOutput : threadsOutputs) {
 			parsedTrees.addAll(threadOutput);
 		}
+		Treebank parsedTreebank = new Treebank(parsedTrees);
 
 		//4.5. unSmooting parent
-		parsedTrees = ParentEncoding.getInstance().unSmooting(parsedTrees);
+		parsedTreebank = ParentEncoding.getInstance().unSmooting(parsedTreebank);
 
 		// 5. de-transform trees
-		writeParseTrees("parseBinarizing", parsedTrees);
-		parsedTrees = TrainCalculateProbs.getInstance().deTransformTree(parsedTrees);
-		writeParseTrees("parseDeBinarizing", parsedTrees);
+		writeParseTrees("parseBinarizing", parsedTreebank.getAnalyses());
+		parsedTreebank = TrainCalculateProbs.getInstance().deTransformTreebank(parsedTreebank);
+//		parsedTreebank.deCnf();
+		writeParseTrees("parseDeBinarizing", parsedTreebank.getAnalyses());
 
 		// 6. write output
-		writeOutput(args[2]+"_"+h, myGrammar, parsedTrees);
+		writeOutput(args[2]+"_"+h, myGrammar, parsedTreebank.getAnalyses());
 	}
 	
 	
@@ -159,7 +161,7 @@ public class Parse {
 	/**
 	 * Writes the parsed trees into a file.
 	 */
-	private static void writeParseTrees(String sExperimentName,
+	public static void writeParseTrees(String sExperimentName,
 			List<Tree> myTrees) {
 		LineWriter writer = new LineWriter(sExperimentName+".parsed");
 		for (int i = 0; i < myTrees.size(); i++) {

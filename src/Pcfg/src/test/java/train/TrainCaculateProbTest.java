@@ -14,37 +14,57 @@ public class TrainCaculateProbTest extends AbstractTest {
 	public void beforeTest() {
 		readData();
 	}
-	
+
 	@Test
-	public void binarizationDeBinarizationBasicTest1() {
+	public void binarizationDeBinarizationBasicTestMethod1() {
 		for (int h = -5; h <= 5; ++h) {
 			Treebank goldTreebankCopy = read(goldFile);
 			goldTreebankCopy = TrainCalculateProbs.getInstance().updateTreebankToCNF(goldTreebankCopy, h);
-			goldTreebankCopy = new Treebank(TrainCalculateProbs.getInstance().deTransformTree(goldTreebankCopy.getAnalyses()));
-			Assert.assertTrue("gold data changed after binarizing and de-binarizing!", goldTreebankCopy.equals(goldTreebank));
+			goldTreebankCopy = TrainCalculateProbs.getInstance().deTransformTreebank(goldTreebankCopy);
+			Assert.assertTrue("gold data changed after binarizing and de-binarizing!",
+					goldTreebankCopy.equals(goldTreebank));
 			Treebank trainTreebankCopy = read(trainFile);
 			trainTreebankCopy = TrainCalculateProbs.getInstance().updateTreebankToCNF(trainTreebankCopy, h);
-			trainTreebankCopy = new Treebank(TrainCalculateProbs.getInstance().deTransformTree(trainTreebankCopy.getAnalyses()));
-			Assert.assertTrue("train data changed after binarizing and de-binarizing!", goldTreebankCopy.equals(goldTreebank));
+			trainTreebankCopy = TrainCalculateProbs.getInstance().deTransformTreebank(trainTreebankCopy);
+			Assert.assertTrue("train data changed after binarizing and de-binarizing!",
+					goldTreebankCopy.equals(goldTreebank));
 		}
 	}
-	
+
 	@Test
-	public void binarizationDeBinarizationBasicTest2() {
+	public void binarizationDeBinarizationBasicTestMethod2() {
 		for (int h = -5; h <= 5; ++h) {
 			Treebank goldTreebankCopy = read(goldFile);
-			for(Tree tree : goldTreebankCopy.getAnalyses()) {
+			for (Tree tree : goldTreebankCopy.getAnalyses()) {
 				tree.toCnf();
 				tree.deCnf();
 			}
-			Assert.assertTrue("gold data changed after binarizing and de-binarizing!", goldTreebankCopy.equals(goldTreebank));
+			Assert.assertTrue("gold data changed after binarizing and de-binarizing!",
+					goldTreebankCopy.equals(goldTreebank));
 			Treebank trainTreebankCopy = read(trainFile);
-			for(Tree tree : trainTreebankCopy.getAnalyses()) {
+			for (Tree tree : trainTreebankCopy.getAnalyses()) {
 				tree.toCnf();
 				tree.deCnf();
 			}
-			Assert.assertTrue("train data changed after binarizing and de-binarizing!", trainTreebankCopy.equals(trainTreebankCopy));
+			Assert.assertTrue("train data changed after binarizing and de-binarizing!",
+					trainTreebankCopy.equals(trainTreebankCopy));
 		}
 	}
-	
+
+	@Test
+	public void binarizationDeBinarizationBasicTestMixedMethods() {
+		for (int h = -5; h <= 5; ++h) {
+			Treebank goldTreebankCopy = read(goldFile);
+			goldTreebankCopy = TrainCalculateProbs.getInstance().updateTreebankToCNF(goldTreebankCopy, h);
+			goldTreebankCopy.deCnf();
+			Assert.assertTrue("gold data changed after binarizing and de-binarizing!",
+					goldTreebankCopy.equals(goldTreebank));
+			Treebank trainTreebankCopy = read(trainFile);
+			trainTreebankCopy.toCnf();
+			trainTreebankCopy = TrainCalculateProbs.getInstance().deTransformTreebank(trainTreebankCopy);
+			Assert.assertTrue("train data changed after binarizing and de-binarizing!",
+					trainTreebankCopy.equals(trainTreebankCopy));
+		}
+	}
+
 }

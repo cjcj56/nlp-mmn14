@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 import grammar.Grammar;
 import grammar.Rule;
-
+import parse.Parse;
 import tree.Node;
 import tree.Terminal;
 import tree.Tree;
@@ -56,15 +56,18 @@ public class TrainCalculateProbs extends Train {
         for (Rule rule : grammar.getSyntacticRules()) {
             rule.setMinusLogProb(calculateRuleProbs(grammar, rule));
         }
+        
         return grammar;
     }
 
     private void preProcess(Treebank treebank) {
     	LOGGER.fine("preprocessing input");
         smoothInfrequentWords(treebank);
+        treebank = ParentEncoding.getInstance().smooting(treebank);
+		Parse.writeParseTrees("TrainBinarizingWithSmooting", treebank.getAnalyses());
 
     }
-
+    
     private void smoothInfrequentWords(Treebank treebank) {
     	smoothInfrequentWords(treebank, INFREQUENT_WORD_THRESH);
     }
@@ -116,6 +119,9 @@ public class TrainCalculateProbs extends Train {
 
     private Node updateNode(Node node) {
         if (node.getDaughters().size() > 2) {
+        	// CNF transformation of the node with more than two daughters, 
+        	// includes transferring redundant daughters (except the left node)-
+        	//  to the next level of the tree
             Node newNode = (Node) node.clone();
             newNode.cloneBrothers(node);
 
@@ -156,11 +162,13 @@ public class TrainCalculateProbs extends Train {
         }
     }
 
-    public List<Tree> deTransformTree(List<Tree> myTreebank) {
-        for (Tree tree : myTreebank) {
+    public Treebank deTransformTreebank(Treebank treebank) {
+    	int i = 0;
+        for (Tree tree : treebank.getAnalyses()) {
+        	System.out.println(i++);
             deTransform(tree.getRoot());
         }
-        return myTreebank;
+        return treebank;
     }
 
     private boolean deTransform(Node node) {

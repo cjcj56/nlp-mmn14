@@ -7,7 +7,9 @@ public class Consts {
 	public static final String SISTER_DEL = ",";
 	public static final String NO_NODE_SYM = "-";
 	public static final String PARENT_DEL = "@";
+	public static final String ARTIFICIAL_MARKER = "@";
 	public static final String DEFAULT_SYM = "NN";
+	public static final String PARENT_ENCODING = "#";
 	
 	public static final int INFREQUENT_WORD_THRESH = 2;
 	
