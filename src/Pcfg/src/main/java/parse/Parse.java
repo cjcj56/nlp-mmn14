@@ -82,11 +82,11 @@ public class Parse {
 
 		// 3. train
 		LOGGER.info("training");
-		Grammar myGrammar = TrainCalculateProbs.getInstance().train(trainTreebank);
+		Grammar grammar = TrainCalculateProbs.getInstance().train(trainTreebank);
 		
 		// 4. decode
 		LOGGER.info("decoding");
-		Decode.getInstance(myGrammar); // populate Decode collections
+		Decode.getInstance(grammar); // populate Decode collections
 		numOfThreads = multithreaded ? numOfThreads : 1;
 		List<List<Integer>> partitionedRanges = ListPartitioner.partition(goldTreebank.size(), numOfThreads);
 		List<Tree> trees = goldTreebank.getAnalyses();
@@ -129,7 +129,7 @@ public class Parse {
 		writeParseTrees("parseDeBinarizing", parsedTreebank.getAnalyses());
 
 		// 6. write output
-		writeOutput(args[2]+"_"+h, myGrammar, parsedTreebank.getAnalyses());
+		writeOutput(args[2]+"_"+h, grammar, parsedTreebank.getAnalyses());
 	}
 	
 	

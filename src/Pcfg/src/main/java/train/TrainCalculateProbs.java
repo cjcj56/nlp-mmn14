@@ -163,9 +163,7 @@ public class TrainCalculateProbs extends Train {
     }
 
     public Treebank deTransformTreebank(Treebank treebank) {
-    	int i = 0;
         for (Tree tree : treebank.getAnalyses()) {
-        	System.out.println(i++);
             deTransform(tree.getRoot());
         }
         return treebank;

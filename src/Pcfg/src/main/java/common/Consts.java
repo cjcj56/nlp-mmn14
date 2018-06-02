@@ -12,5 +12,6 @@ public class Consts {
 	public static final String PARENT_ENCODING = "#";
 	
 	public static final int INFREQUENT_WORD_THRESH = 2;
+	public static final int MAX_ITERATIONS_FOR_UNIT_RULES = 10;
 	
 }
