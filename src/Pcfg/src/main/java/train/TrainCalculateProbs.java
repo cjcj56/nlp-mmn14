@@ -104,7 +104,7 @@ public class TrainCalculateProbs extends Train {
     public double calculateRuleProbs(Grammar grammar, Rule rule) {
     	int ruleCount = grammar.getRuleCounts().get(rule);
     	double lhsCount = grammar.getNonTerminalSymbolsCounts().get(rule.getLHS().getSymbols().get(0));
-        return (Math.log(ruleCount / lhsCount));
+        return -(Math.log(ruleCount / lhsCount));
     }
 
     public Treebank updateTreebankToCNF(Treebank myTreebank, int h) {

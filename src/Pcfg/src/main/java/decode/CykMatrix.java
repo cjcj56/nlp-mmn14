@@ -2,7 +2,7 @@ package decode;
 
 import static common.Consts.PARENT_DEL;
 import static common.Consts.TOP;
-import static java.lang.Double.NEGATIVE_INFINITY;
+import static java.lang.Double.POSITIVE_INFINITY;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,9 +74,9 @@ public class CykMatrix {
 		assertIndicesInMatrixBounds(row, realColIdx);
 		Map<String, Double> matrixCell = matrix.get(row).get(realColIdx);
 		if (matrixCell == null) {
-			return NEGATIVE_INFINITY;
+			return POSITIVE_INFINITY;
 		} else {
-			return matrixCell.getOrDefault(symbol, NEGATIVE_INFINITY);
+			return matrixCell.getOrDefault(symbol, POSITIVE_INFINITY);
 		}
 	}
 
@@ -97,7 +97,7 @@ public class CykMatrix {
 		}
 		
 		String startSymbol = null;
-		Double prob = NEGATIVE_INFINITY;
+		Double prob = POSITIVE_INFINITY;
 		for (Map.Entry<String, Double> startSymbolProb : startSymbolProbMap.entrySet()) {
 			if(startSymbols.contains(startSymbolProb.getKey())) {
 				if(startSymbolProb.getValue() > prob) {

@@ -4,7 +4,7 @@ import static common.Consts.UNK;
 import static common.Consts.DEFAULT_SYM;
 import static common.Consts.PARENT_ENCODING;
 import static common.Consts.MAX_ITERATIONS_FOR_UNIT_RULES;
-import static java.lang.Double.NEGATIVE_INFINITY;
+import static java.lang.Double.POSITIVE_INFINITY;
 
 import grammar.Grammar;
 import grammar.Rule;
@@ -104,9 +104,9 @@ public class Decode {
 				for (String rhsSymbol : matrixCellProbs.keySet()) {
 					for (Rule rule : m_mapUnaryGrammarIndex.getOrDefault(rhsSymbol, Collections.emptySet())) {
 						Double currProb = matrixCellProbs.getOrDefault(rule.getLHS().getSymbols().get(0),
-								NEGATIVE_INFINITY);
+								POSITIVE_INFINITY);
 						Double computedProb = rule.getMinusLogProb() + currProb;
-						if ((currProb < computedProb) && (computedProb > NEGATIVE_INFINITY)) {
+						if ((currProb > computedProb) && (computedProb < POSITIVE_INFINITY)) {
 							// Rule's form: a --> b c (for binary) and a --> b (for unit)
 							String a = rule.getLHS().getSymbols().get(0); // lhsSymbol
 							String b = rule.getRHS().getSymbols().get(0); // rhsLeftSymbol
@@ -142,7 +142,7 @@ public class Decode {
 						// computedProb = rule.getMinusLogProb() + leftRhsSymbolProb +
 						// rightRhsSymbolProb;
 						// }
-						// if ((currProb < computedProb) && (computedProb > NEGATIVE_INFINITY)) {
+						// if ((currProb > computedProb) && (computedProb < POSITIVE_INFINITY)) {
 						// // Rule's form: a --> b c (for binary) and a --> b (for unit)
 						// String a = rule.getLHS().getSymbols().get(0); // lhsSymbol
 						// String b = rule.getRHS().getSymbols().get(0); // rhsLeftSymbol
@@ -160,14 +160,14 @@ public class Decode {
 						for (String rhsLeftSymbol : matrixLeftChildCellProbs.keySet()) {
 							for (Rule rule : m_mapBinaryGrammarIndex.getOrDefault(rhsLeftSymbol, Collections.emptySet())) {
 								Double currProb = matrixCellProbs.getOrDefault(rule.getLHS().getSymbols().get(0),
-										NEGATIVE_INFINITY);
+										POSITIVE_INFINITY);
 								Double computedProb;
 								Double leftRhsSymbolProb = matrixLeftChildCellProbs
-										.getOrDefault(rule.getRHS().getSymbols().get(0), NEGATIVE_INFINITY);
+										.getOrDefault(rule.getRHS().getSymbols().get(0), POSITIVE_INFINITY);
 								Double rightRhsSymbolProb = matrixRightChildCellProbs
-										.getOrDefault(rule.getRHS().getSymbols().get(1), NEGATIVE_INFINITY);
+										.getOrDefault(rule.getRHS().getSymbols().get(1), POSITIVE_INFINITY);
 								computedProb = rule.getMinusLogProb() + leftRhsSymbolProb + rightRhsSymbolProb;
-								if ((currProb < computedProb) && (computedProb > NEGATIVE_INFINITY)) {
+								if ((currProb > computedProb) && (computedProb < POSITIVE_INFINITY)) {
 									// Rule's form: a --> b c (for binary) and a --> b (for unit)
 									String a = rule.getLHS().getSymbols().get(0); // lhsSymbol
 									String b = rule.getRHS().getSymbols().get(0); // rhsLeftSymbol
@@ -187,9 +187,9 @@ public class Decode {
 							for (String cellSymbol : matrixCellProbs.keySet()) {
 								for (Rule rule : m_mapUnaryGrammarIndex.getOrDefault(cellSymbol, Collections.emptySet())) {
 									Double currProb = matrixCellProbs.getOrDefault(rule.getLHS().getSymbols().get(0),
-											NEGATIVE_INFINITY);
+											POSITIVE_INFINITY);
 									Double computedProb = rule.getMinusLogProb() + currProb;
-									if ((currProb < computedProb) && (computedProb > NEGATIVE_INFINITY)) {
+									if ((currProb > computedProb) && (computedProb < POSITIVE_INFINITY)) {
 										// Rule's form: a --> b c (for binary) and a --> b (for unit)
 										String a = rule.getLHS().getSymbols().get(0); // lhsSymbol
 										String b = rule.getRHS().getSymbols().get(0); // rhsLeftSymbol
