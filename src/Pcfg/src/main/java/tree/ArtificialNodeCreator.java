@@ -9,27 +9,41 @@ public interface ArtificialNodeCreator {
 
 	Node createArtificialNode(List<Node> nodes, Node parent);
 	
-	static String nodeIdJoiner(List<Node> nodes, Node parent) {
-		StringBuilder sb = new StringBuilder();
-		if(nodes.isEmpty()) {
-			 sb.append(NO_NODE_SYM).append(PARENT_DEL);
-			 return parent.isArtificial() ? sb.append(parentPointerExtractor(parent)).toString() : sb.append(parent).toString();
+	static String nodeIdJoiner(List<Node> nodes, int len) {
+		if(len == 0) {
+			return NO_NODE_SYM; 
 		}
-		Iterator<Node> nodesIterator = nodes.iterator();
-		for(Node node = nodesIterator.next(); nodesIterator.hasNext();) {
+		StringBuilder sb = new StringBuilder();
+		if(nodes.size() < len) {
+			for(int i = 0; i < len-nodes.size()-1; ++i) {
+				sb.append(NO_NODE_SYM).append(SISTER_DEL);
+			}
+			if(nodes.isEmpty()) {
+				return sb.append(NO_NODE_SYM).toString();
+			} else {
+				sb.append(NO_NODE_SYM).append(SISTER_DEL);
+			}
+		}
+		// at this point, nodes is a non-empty list
+		for(Iterator<Node> nodesIterator = nodes.iterator(); nodesIterator.hasNext();) {
+			Node node = nodesIterator.next();
 			sb.append(node.getIdentifier());
 			if(nodesIterator.hasNext()) {
 				sb.append(SISTER_DEL);
 			}
 		}
-		 return parent.isArtificial() ? parentPointerExtractor(parent) : sb.append(PARENT_DEL).append(parent).toString();
+		 return sb.toString();
 	}
 	
+	/**
+	 * @param parent
+	 * @return 
+	 */
 	static String parentPointerExtractor(Node parent) {
-		if(parent.getIdentifier().contains(PARENT_DEL)) {
+		if(parent.isArtificial()) { // if node is artificial, it has a parent delimiter for reconstruction purposes
 			return parent.getIdentifier().substring(parent.getIdentifier().indexOf(PARENT_DEL));
 		} else {
-			return null;
+			return PARENT_DEL + parent.getIdentifier();
 		}
 	}
 }

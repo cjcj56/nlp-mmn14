@@ -57,8 +57,8 @@ public class ParentEncoding {
 
     private void subFatherForChild(List<Node> nodes) {
         for (Node nd : nodes) { // nodes.get(0) == root nodes
-            if(nd.getIdentifier().contains("#")) {
-                nd.setIdentifier(nd.getIdentifier().substring(0, nd.getIdentifier().indexOf("#")));
+            if(nd.getIdentifier().contains(PARENT_ENCODING)) {
+                nd.setIdentifier(nd.getIdentifier().substring(0, nd.getIdentifier().indexOf(PARENT_ENCODING)));
             }
         }
     }

@@ -61,7 +61,12 @@ public class CykMatrix {
 	public Map<String, Double> get(int row, int col) {
 		int realColIdx = getRealColIdx(row, col);
 		assertIndicesInMatrixBounds(row, realColIdx);
-		return matrix.get(row).get(realColIdx);
+		Map<String, Double> cellProbs = matrix.get(row).get(realColIdx);
+		if(cellProbs == null ) {
+			cellProbs = new HashMap<>();
+			matrix.get(row).add(realColIdx, cellProbs);
+		}
+		return cellProbs;
 	}
 
 	public Double get(int row, int col, String symbol) {

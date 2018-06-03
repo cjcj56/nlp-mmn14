@@ -41,7 +41,7 @@ public class Parse {
 	public static final String LOG_CONF = "./conf/logging.properties";
 	
 	public static int numOfThreads = 20;
-	public static int h = 1;
+	public static int h = 2;
 	public static boolean multithreaded = true;
 	public static boolean trainOnGold = false; // for debugging, runs much faster
 
@@ -76,8 +76,8 @@ public class Parse {
 
 		// 2. transform trees
 		LOGGER.info("transforming to CNF");
-		trainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(trainTreebank, h);
-//		trainTreebank.toCnf();
+//		trainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(trainTreebank, h);
+		trainTreebank.toCnf(h);
 		writeParseTrees("TrainBinarizing", trainTreebank.getAnalyses());
 
 		// 3. train
@@ -124,8 +124,8 @@ public class Parse {
 
 		// 5. de-transform trees
 		writeParseTrees("parseBinarizing", parsedTreebank.getAnalyses());
-		parsedTreebank = TrainCalculateProbs.getInstance().deTransformTreebank(parsedTreebank);
-//		parsedTreebank.deCnf();
+//		parsedTreebank = TrainCalculateProbs.getInstance().deTransformTreebank(parsedTreebank);
+		parsedTreebank.deCnf();
 		writeParseTrees("parseDeBinarizing", parsedTreebank.getAnalyses());
 
 		// 6. write output

@@ -8,6 +8,9 @@ import static java.lang.Double.NEGATIVE_INFINITY;
 
 import grammar.Grammar;
 import grammar.Rule;
+
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -24,8 +27,8 @@ public class Decode {
 	public static Set<Rule> m_setGrammarRules = null;
 	public static Map<String, Set<Rule>> m_mapLexicalRules = null;
 
-	public static Set<Rule> m_setUnaryGrammarRules = null;
-	public static Set<Rule> m_setBinaryGrammarRules = null;
+	public static Map<String, Set<Rule>> m_mapUnaryGrammarIndex = null; // IndexedByRhs
+	public static Map<String, Set<Rule>> m_mapBinaryGrammarIndex = null; // IndexedByRhsLeftSymbol
 
 	/**
 	 * Implementation of a singleton pattern Avoids redundant instances in memory
@@ -39,14 +42,17 @@ public class Decode {
 			m_setGrammarRules = g.getSyntacticRules();
 			m_mapLexicalRules = g.getLexicalEntries();
 
-			m_setUnaryGrammarRules = new HashSet<>();
-			m_setBinaryGrammarRules = new HashSet<>();
+			m_mapUnaryGrammarIndex = new HashMap<>();
+			m_mapBinaryGrammarIndex = new HashMap<>();
+			
+			Map<String, Set<Rule>> index;
 			for (Rule rule : m_setGrammarRules) {
-				if (rule.isUnitRule()) {
-					m_setUnaryGrammarRules.add(rule);
-				} else {
-					m_setBinaryGrammarRules.add(rule);
+				String rhsLeftSymbol = rule.getRHS().getSymbols().get(0);
+				index = rule.isUnitRule() ? m_mapUnaryGrammarIndex : m_mapBinaryGrammarIndex;
+				if (!index.containsKey(rhsLeftSymbol)) {
+					index.put(rhsLeftSymbol, new HashSet<Rule>());
 				}
+				index.get(rhsLeftSymbol).add(rule);
 			}
 		}
 		return m_singDecoder;
@@ -83,68 +89,118 @@ public class Decode {
 							.append(DEFAULT_SYM).append(PARENT_ENCODING).toString());
 				}
 			}
+			// run through lexical rules for each word
 			for (Rule rule : wordLexicalRules) {
 				cyk.set(j - 1, j, rule.getLHS().getSymbols().get(0), rule.getMinusLogProb());
 				cyk.setBackTrace(j - 1, j, rule.getLHS().getSymbols().get(0), -1, input.get(j - 1), null);
 			}
+			boolean foundAppropriateRule = true;
+			int iterCount = 0;
+			Map<String, Double> matrixCellProbs = cyk.get(j - 1, j);
+			// after lexical rules, run through unary rules till convergence or max
+			// iteration achieved
+			while (foundAppropriateRule && iterCount < MAX_ITERATIONS_FOR_UNIT_RULES) {
+				foundAppropriateRule = false;
+				for (String rhsSymbol : matrixCellProbs.keySet()) {
+					for (Rule rule : m_mapUnaryGrammarIndex.getOrDefault(rhsSymbol, Collections.emptySet())) {
+						Double currProb = matrixCellProbs.getOrDefault(rule.getLHS().getSymbols().get(0),
+								NEGATIVE_INFINITY);
+						Double computedProb = rule.getMinusLogProb() + currProb;
+						if ((currProb < computedProb) && (computedProb > NEGATIVE_INFINITY)) {
+							// Rule's form: a --> b c (for binary) and a --> b (for unit)
+							String a = rule.getLHS().getSymbols().get(0); // lhsSymbol
+							String b = rule.getRHS().getSymbols().get(0); // rhsLeftSymbol
+							String c = null; // rhsRightSymbol
+							cyk.set(j - 1, j, a, computedProb);
+							cyk.setBackTrace(j - 1, j, a, -1, b, c);
+							foundAppropriateRule = true;
+						}
+					}
+				}
+			}
 
 			for (int i = j - 2; i >= 0; --i) {
+				matrixCellProbs = cyk.get(i, j);
 				for (int k = i + 1; k <= j - 1; ++k) {
-					if ((cyk.get(i, k) != null) && (cyk.get(k, j) != null)) {
-						boolean foundAppropriateRule = true;
-						int iterCount = 0;
-						while (foundAppropriateRule && (iterCount < MAX_ITERATIONS_FOR_UNIT_RULES)) {
-							foundAppropriateRule = false;
-							++iterCount;
-							for (Rule rule : m_setGrammarRules) {
-								Double currProb = cyk.get(i, j, rule.getLHS().getSymbols().get(0));
+					Map<String, Double> matrixLeftChildCellProbs = cyk.get(i, k);
+					Map<String, Double> matrixRightChildCellProbs = cyk.get(k, j);
+					if ((!matrixLeftChildCellProbs.isEmpty()) && (!matrixRightChildCellProbs.isEmpty())) {
+						// boolean foundAppropriateRule = true;
+						// int iterCount = 0;
+						// while (foundAppropriateRule && (iterCount < MAX_ITERATIONS_FOR_UNIT_RULES)) {
+						// foundAppropriateRule = false;
+						// ++iterCount;
+						// for (Rule rule : m_setGrammarRules) {
+						// Double currProb = cyk.get(i, j, rule.getLHS().getSymbols().get(0));
+						// Double computedProb;
+						// boolean unitRule = rule.isUnitRule();
+						// if (unitRule) {
+						// computedProb = rule.getMinusLogProb() + currProb;
+						// } else {
+						// Double leftRhsSymbolProb = cyk.get(i, k, rule.getRHS().getSymbols().get(0));
+						// Double rightRhsSymbolProb = cyk.get(k, j, rule.getRHS().getSymbols().get(1));
+						// computedProb = rule.getMinusLogProb() + leftRhsSymbolProb +
+						// rightRhsSymbolProb;
+						// }
+						// if ((currProb < computedProb) && (computedProb > NEGATIVE_INFINITY)) {
+						// // Rule's form: a --> b c (for binary) and a --> b (for unit)
+						// String a = rule.getLHS().getSymbols().get(0); // lhsSymbol
+						// String b = rule.getRHS().getSymbols().get(0); // rhsLeftSymbol
+						// String c = unitRule ? null : rule.getRHS().getSymbols().get(1); //
+						// rhsRightSymbol
+						// cyk.set(i, j, a, computedProb);
+						// cyk.setBackTrace(i, j, a, k, b, c);
+						// foundAppropriateRule = true;
+						// // }
+						// }
+						// }
+
+						// run through binary rules
+						foundAppropriateRule = false;
+						for (String rhsLeftSymbol : matrixLeftChildCellProbs.keySet()) {
+							for (Rule rule : m_mapBinaryGrammarIndex.getOrDefault(rhsLeftSymbol, Collections.emptySet())) {
+								Double currProb = matrixCellProbs.getOrDefault(rule.getLHS().getSymbols().get(0),
+										NEGATIVE_INFINITY);
 								Double computedProb;
-								boolean unitRule = rule.isUnitRule();
-								if (unitRule) {
-									computedProb = rule.getMinusLogProb() + currProb;
-								} else {
-									Double leftRhsSymbolProb = cyk.get(i, k, rule.getRHS().getSymbols().get(0));
-									Double rightRhsSymbolProb = cyk.get(k, j, rule.getRHS().getSymbols().get(1));
-									computedProb = rule.getMinusLogProb() + leftRhsSymbolProb + rightRhsSymbolProb;
-								}
+								Double leftRhsSymbolProb = matrixLeftChildCellProbs
+										.getOrDefault(rule.getRHS().getSymbols().get(0), NEGATIVE_INFINITY);
+								Double rightRhsSymbolProb = matrixRightChildCellProbs
+										.getOrDefault(rule.getRHS().getSymbols().get(1), NEGATIVE_INFINITY);
+								computedProb = rule.getMinusLogProb() + leftRhsSymbolProb + rightRhsSymbolProb;
 								if ((currProb < computedProb) && (computedProb > NEGATIVE_INFINITY)) {
 									// Rule's form: a --> b c (for binary) and a --> b (for unit)
 									String a = rule.getLHS().getSymbols().get(0); // lhsSymbol
 									String b = rule.getRHS().getSymbols().get(0); // rhsLeftSymbol
-									String c = unitRule ? null : rule.getRHS().getSymbols().get(1); // rhsRightSymbol
+									String c = rule.getRHS().getSymbols().get(1); // rhsRightSymbol
 									cyk.set(i, j, a, computedProb);
 									cyk.setBackTrace(i, j, a, k, b, c);
 									foundAppropriateRule = true;
 								}
 							}
 						}
-						/*
-						 * boolean foundAppropriateRule = false; for (Rule rule :
-						 * m_setBinaryGrammarRules) { Double currProb = cyk.get(i, j,
-						 * rule.getLHS().getSymbols().get(0)); Double computedProb; Double
-						 * leftRhsSymbolProb = cyk.get(i, k, rule.getRHS().getSymbols().get(0)); Double
-						 * rightRhsSymbolProb = cyk.get(k, j, rule.getRHS().getSymbols().get(1));
-						 * computedProb = rule.getMinusLogProb() + leftRhsSymbolProb +
-						 * rightRhsSymbolProb; if ((currProb < computedProb) && (computedProb >
-						 * NEGATIVE_INFINITY)) { // Rule's form: a --> b c (for binary) and a --> b (for
-						 * unit) String a = rule.getLHS().getSymbols().get(0); // lhsSymbol String b =
-						 * rule.getRHS().getSymbols().get(0); // rhsLeftSymbol String c =
-						 * rule.getRHS().getSymbols().get(1); // rhsRightSymbol cyk.set(i, j, a,
-						 * computedProb); cyk.setBackTrace(i, j, a, k, b, c); foundAppropriateRule =
-						 * true; } }
-						 * 
-						 * int iterCount = 0; while((foundAppropriateRule) && (iterCount <
-						 * MAX_ITERATIONS_FOR_UNIT_RULES)) { // if no rule found, there is no point
-						 * going over unary rules again ++iterCount; foundAppropriateRule = false;
-						 * for(Rule rule : m_setUnaryGrammarRules) { Double currProb = cyk.get(i, j,
-						 * rule.getLHS().getSymbols().get(0)); Double computedProb =
-						 * rule.getMinusLogProb() + currProb; if ((currProb < computedProb) &&
-						 * (computedProb > NEGATIVE_INFINITY)) { // Rule's form: a --> b c (for binary)
-						 * and a --> b (for unit) String a = rule.getLHS().getSymbols().get(0); //
-						 * lhsSymbol String b = rule.getRHS().getSymbols().get(0); // rhsLeftSymbol
-						 * String c = null; // rhsRightSymbol cyk.set(i, j, a, computedProb);
-						 * cyk.setBackTrace(i, j, a, k, b, c); foundAppropriateRule = true; } } }
-						 */
+
+						iterCount = 0;
+						while ((foundAppropriateRule) && (iterCount < MAX_ITERATIONS_FOR_UNIT_RULES)) {
+							// if no rule found, there is no point going over unary rules again
+							++iterCount;
+							foundAppropriateRule = false;
+							for (String cellSymbol : matrixCellProbs.keySet()) {
+								for (Rule rule : m_mapUnaryGrammarIndex.getOrDefault(cellSymbol, Collections.emptySet())) {
+									Double currProb = matrixCellProbs.getOrDefault(rule.getLHS().getSymbols().get(0),
+											NEGATIVE_INFINITY);
+									Double computedProb = rule.getMinusLogProb() + currProb;
+									if ((currProb < computedProb) && (computedProb > NEGATIVE_INFINITY)) {
+										// Rule's form: a --> b c (for binary) and a --> b (for unit)
+										String a = rule.getLHS().getSymbols().get(0); // lhsSymbol
+										String b = rule.getRHS().getSymbols().get(0); // rhsLeftSymbol
+										String c = null; // rhsRightSymbol
+										cyk.set(i, j, a, computedProb);
+										cyk.setBackTrace(i, j, a, k, b, c);
+										foundAppropriateRule = true;
+									}
+								}
+							}
+						}
 					}
 				}
 			}

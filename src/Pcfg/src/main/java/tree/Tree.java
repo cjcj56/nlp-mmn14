@@ -94,7 +94,7 @@ public class Tree {
 				daughters.removeAll(redundantDaugthers);
 				Node newDaughter = artificialNodeCreator.createArtificialNode(redundantDaugthers, node);
 			}
-			if(daughters.size() == 2) {
+			if(daughters.size() == 2) { // at this point, there are either 1 or 2 daughters
 				toCnf(daughters.get(1), artificialNodeCreator);
 			}
 		}
