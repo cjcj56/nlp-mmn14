@@ -11,7 +11,9 @@ import java.util.logging.Logger;
 import grammar.Grammar;
 import grammar.Rule;
 import parse.Parse;
+import tree.ArtificialNodeCreator;
 import tree.Node;
+import tree.SimpleAritificialNodeCreator;
 import tree.Terminal;
 import tree.Tree;
 import treebank.Treebank;
@@ -62,9 +64,9 @@ public class TrainCalculateProbs extends Train {
 
     private void preProcess(Treebank treebank) {
     	LOGGER.fine("preprocessing input");
-        smoothInfrequentWords(treebank);
+//        smoothInfrequentWords(treebank);
 //        treebank = ParentEncoding.getInstance().smooting(treebank);
-		Parse.writeParseTrees("TrainBinarizingWithSmooting", treebank.getAnalyses());
+//		Parse.writeParseTrees("TrainBinarizingWithSmooting", treebank.getAnalyses());
 
     }
     
@@ -190,5 +192,23 @@ public class TrainCalculateProbs extends Train {
         }
         return false;
     }
+    
+    public void toCnf(Treebank treebank) {
+    	toCnf(treebank, 0);
+    }
+    
+    public void toCnf(Treebank treebank, int h) {
+    	toCnf(treebank, new SimpleAritificialNodeCreator(h));
+    }
+    
+    public void toCnf(Treebank treebank, ArtificialNodeCreator artificialNodeCreator) {
+    	treebank.toCnf(artificialNodeCreator);
+    }
+    
+    public void deCnf(Treebank treebank) {
+    	treebank.deCnf();
+    }
+    
+    
 
 }

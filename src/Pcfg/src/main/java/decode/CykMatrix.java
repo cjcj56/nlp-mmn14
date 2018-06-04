@@ -1,6 +1,5 @@
 package decode;
 
-import static common.Consts.PARENT_DEL;
 import static common.Consts.TOP;
 import static java.lang.Double.POSITIVE_INFINITY;
 
@@ -11,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import common.Consts;
 import common.Triplet;
 import tree.Node;
 import tree.Terminal;
@@ -19,6 +17,7 @@ import tree.Tree;
 
 public class CykMatrix {
 
+	@SuppressWarnings("unused")
 	private static final Logger LOGGER = Logger.getLogger(CykMatrix.class.getName());
 	
 	private int n;
@@ -36,7 +35,7 @@ public class CykMatrix {
 		for (int i = 0; i < n; ++i) {
 			List<Map<String, Double>> matrixSublist = new ArrayList<Map<String, Double>>(i + 1);
 			for (int j = 0; j < n - i; ++j) {
-				matrixSublist.add(null);
+				matrixSublist.add(new HashMap<String, Double>());
 			}
 			matrix.add(matrixSublist);
 		}
@@ -50,34 +49,25 @@ public class CykMatrix {
 	public void set(int row, int col, String symbol, Double logProb) {
 		int realColIdx = getRealColIdx(row, col);
 		assertIndicesInMatrixBounds(row, realColIdx);
-		Map<String, Double> matrixCell = matrix.get(row).get(realColIdx);
-		if (matrixCell == null) {
-			matrixCell = new HashMap<>();
-			matrix.get(row).set(realColIdx, matrixCell);
-		}
-		matrixCell.put(symbol, logProb);
+		matrix.get(row).get(realColIdx).put(symbol, logProb);
+	}
+	
+	public void putAllProbs(int row, int col, Map<String, Double> probsMap) {
+		int realColIdx = getRealColIdx(row, col);
+		assertIndicesInMatrixBounds(row, realColIdx);
+		matrix.get(row).get(realColIdx).putAll(probsMap);
 	}
 
 	public Map<String, Double> get(int row, int col) {
 		int realColIdx = getRealColIdx(row, col);
 		assertIndicesInMatrixBounds(row, realColIdx);
-		Map<String, Double> cellProbs = matrix.get(row).get(realColIdx);
-		if(cellProbs == null ) {
-			cellProbs = new HashMap<>();
-			matrix.get(row).add(realColIdx, cellProbs);
-		}
-		return cellProbs;
+		return matrix.get(row).get(realColIdx);
 	}
 
 	public Double get(int row, int col, String symbol) {
 		int realColIdx = getRealColIdx(row, col); 
 		assertIndicesInMatrixBounds(row, realColIdx);
-		Map<String, Double> matrixCell = matrix.get(row).get(realColIdx);
-		if (matrixCell == null) {
-			return POSITIVE_INFINITY;
-		} else {
-			return matrixCell.getOrDefault(symbol, POSITIVE_INFINITY);
-		}
+		return matrix.get(row).get(realColIdx).getOrDefault(symbol, POSITIVE_INFINITY);
 	}
 
 	private void assertIndicesInMatrixBounds(int row, int col) {
@@ -88,6 +78,10 @@ public class CykMatrix {
 	public void setBackTrace(int row, int col, String lhsSymbol,
 			int childIdx, String rhsLeftSymbol, String rhsRightSymbol) {
 		backTrace.put(new Triplet<>(row, col, lhsSymbol), new Triplet<>(childIdx, rhsLeftSymbol, rhsRightSymbol));
+	}
+	
+	public void putAllBacktraces(Map<Triplet<Integer, Integer, String>, Triplet<Integer, String, String>> backTrace) {
+		this.backTrace.putAll(backTrace);
 	}
 
 	public Tree buildTree(Set<String> startSymbols) {
@@ -100,7 +94,7 @@ public class CykMatrix {
 		Double prob = POSITIVE_INFINITY;
 		for (Map.Entry<String, Double> startSymbolProb : startSymbolProbMap.entrySet()) {
 			if(startSymbols.contains(startSymbolProb.getKey())) {
-				if(startSymbolProb.getValue() > prob) {
+				if(startSymbolProb.getValue() < prob) {
 					startSymbol = startSymbolProb.getKey();
 					prob = startSymbolProb.getValue();
 				}
@@ -129,6 +123,10 @@ public class CykMatrix {
 		if(isTerminal(nextTriplet)) {
 			Terminal terminal = new Terminal(nextTriplet.b);
 			node.addDaughter(terminal);
+		} else if(isUnaryProduct(nextTriplet)) {
+			Node childNode = new Node(nextTriplet.b);
+			node.addDaughter(childNode);
+			buildChild(childNode, new Triplet<Integer, Integer, String>(triplet.a, triplet.b, nextTriplet.b));
 		} else {
 			Node leftNode = new Node(nextTriplet.b);
 			node.addDaughter(leftNode);
@@ -150,6 +148,10 @@ public class CykMatrix {
 	
 	private boolean isTerminal(Triplet<Integer, String, String> triplet) {
 		return triplet.a == -1;
+	}
+	
+	private boolean isUnaryProduct(Triplet<Integer, String, String> triplet) {
+		return triplet.a == -2;
 	}
 	
 }

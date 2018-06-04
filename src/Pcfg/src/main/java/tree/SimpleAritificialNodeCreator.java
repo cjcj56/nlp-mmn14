@@ -15,7 +15,8 @@ public class SimpleAritificialNodeCreator implements ArtificialNodeCreator {
 	
 	@Override
 	public Node createArtificialNode(List<Node> nodes, Node parent) {
-		Node artificialNode = new Node(nodeIdJoiner(h <= nodes.size() ? nodes.subList(0, h) : nodes, h) + parentPointerExtractor(parent));
+		String sistersIds = h == -1 ? nodeIdJoiner(nodes) : nodeIdJoiner(h < nodes.size() ? nodes.subList(0, h) : nodes, h);
+		Node artificialNode = new Node(parentPointerExtractor(parent) + sistersIds);
 		parent.addDaughter(artificialNode); // invokes artificialNode.setParent(parent) as well 
 		artificialNode.setDaughters(nodes);
 		return artificialNode;

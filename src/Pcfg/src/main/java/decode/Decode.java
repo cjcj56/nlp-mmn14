@@ -16,12 +16,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import common.Triplet;
 import tree.Node;
 import tree.Terminal;
 import tree.Tree;
 
 public class Decode {
+
+	private static final Logger LOGGER = Logger.getLogger(Decode.class.getName());
 
 	public static Set<String> m_setStartSymbols = null;
 	public static Set<Rule> m_setGrammarRules = null;
@@ -29,6 +34,7 @@ public class Decode {
 
 	public static Map<String, Set<Rule>> m_mapUnaryGrammarIndex = null; // IndexedByRhs
 	public static Map<String, Set<Rule>> m_mapBinaryGrammarIndex = null; // IndexedByRhsLeftSymbol
+	public static Double defaultLogProb = null;
 
 	/**
 	 * Implementation of a singleton pattern Avoids redundant instances in memory
@@ -37,6 +43,7 @@ public class Decode {
 
 	public static Decode getInstance(Grammar g) {
 		if (m_singDecoder == null) {
+			LOGGER.info("creating decoder instance");
 			m_singDecoder = new Decode();
 			m_setStartSymbols = g.getStartSymbols();
 			m_setGrammarRules = g.getSyntacticRules();
@@ -44,7 +51,7 @@ public class Decode {
 
 			m_mapUnaryGrammarIndex = new HashMap<>();
 			m_mapBinaryGrammarIndex = new HashMap<>();
-			
+
 			Map<String, Set<Rule>> index;
 			for (Rule rule : m_setGrammarRules) {
 				String rhsLeftSymbol = rule.getRHS().getSymbols().get(0);
@@ -54,6 +61,17 @@ public class Decode {
 				}
 				index.get(rhsLeftSymbol).add(rule);
 			}
+			
+			int count = 0;
+			defaultLogProb = 0.0;
+			for(Rule rule : g.getLexicalRules()) {
+				if(rule.getLHS().getSymbols().get(0).equals(DEFAULT_SYM)) {
+					defaultLogProb += rule.getMinusLogProb();
+					++count;
+				}
+			}
+			defaultLogProb = count == 0 ? 1 : defaultLogProb / count; 
+			LOGGER.info("decoder instance created");
 		}
 		return m_singDecoder;
 	}
@@ -63,6 +81,9 @@ public class Decode {
 		// Done: Baseline Decoder
 		// Returns a flat tree with NN labels on all leaves
 
+		if (LOGGER.isLoggable(Level.FINEST)) {
+			LOGGER.finest("dummy decoder for sentence: " + input);
+		}
 		Tree t = new Tree(new Node("TOP"));
 		Iterator<String> theInput = input.iterator();
 		while (theInput.hasNext()) {
@@ -77,22 +98,22 @@ public class Decode {
 		// if CYK fails,
 		// use the baseline outcome
 
+		if (LOGGER.isLoggable(Level.FINEST)) {
+			LOGGER.finest("CYK decoder for sentence: " + input);
+		}
 		CykMatrix cyk = new CykMatrix(input.size());
 		for (int j = 1; j <= cyk.n(); ++j) {
 			String word = input.get(j - 1);
 			Set<Rule> wordLexicalRules = m_mapLexicalRules.get(word);
 			if (wordLexicalRules == null) {
-				wordLexicalRules = m_mapLexicalRules.get(UNK);
-				if (wordLexicalRules == null) { // ParentEncoding applied
-					// assuming that there are unknown nouns (i.e. "UNK#NN#")
-					wordLexicalRules = m_mapLexicalRules.get(new StringBuilder(UNK).append(PARENT_ENCODING)
-							.append(DEFAULT_SYM).append(PARENT_ENCODING).toString());
+				cyk.set(j-1, j, DEFAULT_SYM, defaultLogProb);
+				cyk.setBackTrace(j-1, j, DEFAULT_SYM, -1, word, null);
+			} else {
+				// run through lexical rules for each word
+				for (Rule rule : wordLexicalRules) {
+					cyk.set(j - 1, j, rule.getLHS().getSymbols().get(0), rule.getMinusLogProb());
+					cyk.setBackTrace(j - 1, j, rule.getLHS().getSymbols().get(0), -1, word, null);
 				}
-			}
-			// run through lexical rules for each word
-			for (Rule rule : wordLexicalRules) {
-				cyk.set(j - 1, j, rule.getLHS().getSymbols().get(0), rule.getMinusLogProb());
-				cyk.setBackTrace(j - 1, j, rule.getLHS().getSymbols().get(0), -1, input.get(j - 1), null);
 			}
 			boolean foundAppropriateRule = true;
 			int iterCount = 0;
@@ -100,23 +121,31 @@ public class Decode {
 			// after lexical rules, run through unary rules till convergence or max
 			// iteration achieved
 			while (foundAppropriateRule && iterCount < MAX_ITERATIONS_FOR_UNIT_RULES) {
+				iterCount++;
 				foundAppropriateRule = false;
-				for (String rhsSymbol : matrixCellProbs.keySet()) {
-					for (Rule rule : m_mapUnaryGrammarIndex.getOrDefault(rhsSymbol, Collections.emptySet())) {
+				Map<String, Double> probChangesHolder = new HashMap<>();
+				Map<Triplet<Integer, Integer, String>, Triplet<Integer, String, String>> backtraceChangesHolder = new HashMap<>();
+				for (Map.Entry<String, Double> cellSymbolProb : matrixCellProbs.entrySet()) {
+					for (Rule rule : m_mapUnaryGrammarIndex.getOrDefault(cellSymbolProb.getKey(),
+							Collections.emptySet())) {
 						Double currProb = matrixCellProbs.getOrDefault(rule.getLHS().getSymbols().get(0),
 								POSITIVE_INFINITY);
-						Double computedProb = rule.getMinusLogProb() + currProb;
+						Double computedProb = rule.getMinusLogProb() + cellSymbolProb.getValue();
 						if ((currProb > computedProb) && (computedProb < POSITIVE_INFINITY)) {
 							// Rule's form: a --> b c (for binary) and a --> b (for unit)
 							String a = rule.getLHS().getSymbols().get(0); // lhsSymbol
 							String b = rule.getRHS().getSymbols().get(0); // rhsLeftSymbol
 							String c = null; // rhsRightSymbol
-							cyk.set(j - 1, j, a, computedProb);
-							cyk.setBackTrace(j - 1, j, a, -1, b, c);
+							probChangesHolder.put(a, computedProb); // TODO BUG ALERT!!! if a appears in lexical and grammar rule, grammar overrides lexical and deletes words from backtrace!
+							backtraceChangesHolder.put(new Triplet<>(j - 1, j, a), new Triplet<>(-2, b, c));
+							// cyk.set(j - 1, j, a, computedProb);
+							// cyk.setBackTrace(j - 1, j, a, -1, b, c);
 							foundAppropriateRule = true;
 						}
 					}
 				}
+				matrixCellProbs.putAll(matrixCellProbs);
+				cyk.putAllBacktraces(backtraceChangesHolder);
 			}
 
 			for (int i = j - 2; i >= 0; --i) {
@@ -125,48 +154,18 @@ public class Decode {
 					Map<String, Double> matrixLeftChildCellProbs = cyk.get(i, k);
 					Map<String, Double> matrixRightChildCellProbs = cyk.get(k, j);
 					if ((!matrixLeftChildCellProbs.isEmpty()) && (!matrixRightChildCellProbs.isEmpty())) {
-						// boolean foundAppropriateRule = true;
-						// int iterCount = 0;
-						// while (foundAppropriateRule && (iterCount < MAX_ITERATIONS_FOR_UNIT_RULES)) {
-						// foundAppropriateRule = false;
-						// ++iterCount;
-						// for (Rule rule : m_setGrammarRules) {
-						// Double currProb = cyk.get(i, j, rule.getLHS().getSymbols().get(0));
-						// Double computedProb;
-						// boolean unitRule = rule.isUnitRule();
-						// if (unitRule) {
-						// computedProb = rule.getMinusLogProb() + currProb;
-						// } else {
-						// Double leftRhsSymbolProb = cyk.get(i, k, rule.getRHS().getSymbols().get(0));
-						// Double rightRhsSymbolProb = cyk.get(k, j, rule.getRHS().getSymbols().get(1));
-						// computedProb = rule.getMinusLogProb() + leftRhsSymbolProb +
-						// rightRhsSymbolProb;
-						// }
-						// if ((currProb > computedProb) && (computedProb < POSITIVE_INFINITY)) {
-						// // Rule's form: a --> b c (for binary) and a --> b (for unit)
-						// String a = rule.getLHS().getSymbols().get(0); // lhsSymbol
-						// String b = rule.getRHS().getSymbols().get(0); // rhsLeftSymbol
-						// String c = unitRule ? null : rule.getRHS().getSymbols().get(1); //
-						// rhsRightSymbol
-						// cyk.set(i, j, a, computedProb);
-						// cyk.setBackTrace(i, j, a, k, b, c);
-						// foundAppropriateRule = true;
-						// // }
-						// }
-						// }
 
 						// run through binary rules
 						foundAppropriateRule = false;
-						for (String rhsLeftSymbol : matrixLeftChildCellProbs.keySet()) {
-							for (Rule rule : m_mapBinaryGrammarIndex.getOrDefault(rhsLeftSymbol, Collections.emptySet())) {
+						for (Map.Entry<String, Double> rhsLeftSymbolProb : matrixLeftChildCellProbs.entrySet()) {
+							for (Rule rule : m_mapBinaryGrammarIndex.getOrDefault(rhsLeftSymbolProb.getKey(),
+									Collections.emptySet())) {
 								Double currProb = matrixCellProbs.getOrDefault(rule.getLHS().getSymbols().get(0),
 										POSITIVE_INFINITY);
-								Double computedProb;
-								Double leftRhsSymbolProb = matrixLeftChildCellProbs
-										.getOrDefault(rule.getRHS().getSymbols().get(0), POSITIVE_INFINITY);
+								Double leftRhsSymbolProb = rhsLeftSymbolProb.getValue();
 								Double rightRhsSymbolProb = matrixRightChildCellProbs
 										.getOrDefault(rule.getRHS().getSymbols().get(1), POSITIVE_INFINITY);
-								computedProb = rule.getMinusLogProb() + leftRhsSymbolProb + rightRhsSymbolProb;
+								Double computedProb = rule.getMinusLogProb() + leftRhsSymbolProb + rightRhsSymbolProb;
 								if ((currProb > computedProb) && (computedProb < POSITIVE_INFINITY)) {
 									// Rule's form: a --> b c (for binary) and a --> b (for unit)
 									String a = rule.getLHS().getSymbols().get(0); // lhsSymbol
@@ -178,30 +177,36 @@ public class Decode {
 								}
 							}
 						}
+					}
+				}
 
-						iterCount = 0;
-						while ((foundAppropriateRule) && (iterCount < MAX_ITERATIONS_FOR_UNIT_RULES)) {
-							// if no rule found, there is no point going over unary rules again
-							++iterCount;
-							foundAppropriateRule = false;
-							for (String cellSymbol : matrixCellProbs.keySet()) {
-								for (Rule rule : m_mapUnaryGrammarIndex.getOrDefault(cellSymbol, Collections.emptySet())) {
-									Double currProb = matrixCellProbs.getOrDefault(rule.getLHS().getSymbols().get(0),
-											POSITIVE_INFINITY);
-									Double computedProb = rule.getMinusLogProb() + currProb;
-									if ((currProb > computedProb) && (computedProb < POSITIVE_INFINITY)) {
-										// Rule's form: a --> b c (for binary) and a --> b (for unit)
-										String a = rule.getLHS().getSymbols().get(0); // lhsSymbol
-										String b = rule.getRHS().getSymbols().get(0); // rhsLeftSymbol
-										String c = null; // rhsRightSymbol
-										cyk.set(i, j, a, computedProb);
-										cyk.setBackTrace(i, j, a, k, b, c);
-										foundAppropriateRule = true;
-									}
-								}
+				iterCount = 0;
+				while ((foundAppropriateRule) && (iterCount < MAX_ITERATIONS_FOR_UNIT_RULES)) {
+					// if no rule found, there is no point going over unary rules again
+					++iterCount;
+					foundAppropriateRule = false;
+					Map<String, Double> probChangesHolder = new HashMap<>();
+					Map<Triplet<Integer, Integer, String>, Triplet<Integer, String, String>> backtraceChangesHolder = new HashMap<>();
+					for (Map.Entry<String, Double> cellSymbolProb : matrixCellProbs.entrySet()) {
+						for (Rule rule : m_mapUnaryGrammarIndex.getOrDefault(cellSymbolProb.getKey(),
+								Collections.emptySet())) {
+							Double currProb = matrixCellProbs.getOrDefault(rule.getLHS().getSymbols().get(0),
+									POSITIVE_INFINITY);
+							Double computedProb = rule.getMinusLogProb() + cellSymbolProb.getValue();
+							if ((currProb > computedProb) && (computedProb < POSITIVE_INFINITY)) {
+								// Rule's form: a --> b c (for binary) and a --> b (for unit)
+								String a = rule.getLHS().getSymbols().get(0); // lhsSymbol
+								String b = rule.getRHS().getSymbols().get(0); // rhsLeftSymbol
+								probChangesHolder.put(a, computedProb);
+								backtraceChangesHolder.put(new Triplet<>(i, j, a), new Triplet<>(-2, b, null));
+								// cyk.set(i, j, a, computedProb);
+								// cyk.setBackTrace(i, j, a, k, b, c);
+								foundAppropriateRule = true;
 							}
 						}
 					}
+					cyk.putAllProbs(i, j, probChangesHolder);
+					cyk.putAllBacktraces(backtraceChangesHolder);
 				}
 			}
 		}

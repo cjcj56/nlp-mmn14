@@ -91,8 +91,10 @@ public class Tree {
 			toCnf(daughters.get(0), artificialNodeCreator);
 			if (daughters.size() > 2) {
 				List<Node> redundantDaugthers = new ArrayList<>(daughters.subList(1, daughters.size()));
-				daughters.removeAll(redundantDaugthers);
 				Node newDaughter = artificialNodeCreator.createArtificialNode(redundantDaugthers, node);
+				node.setDaughters(new ArrayList<>());
+				node.addDaughter(daughters.get(0));
+				node.addDaughter(newDaughter);
 			}
 			if(daughters.size() == 2) { // at this point, there are either 1 or 2 daughters
 				toCnf(daughters.get(1), artificialNodeCreator);
@@ -112,8 +114,9 @@ public class Tree {
 		if ((daughters != null) && (!daughters.isEmpty())) {
 			if (daughters.size() > 1) {
 				Node rightDughter = daughters.get(1);
+				// only right daughter can be artificial
 				while (rightDughter.isArtificial()) {
-					node.addDaughters(rightDughter.getDaughters());
+					daughters.addAll(rightDughter.getDaughters());
 					rightDughter = daughters.get(daughters.size() - 1);
 				}
 			}

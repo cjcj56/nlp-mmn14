@@ -4,7 +4,7 @@ public class Consts {
 
 	public static final String UNK = "UNK";
 	public static final String TOP = "TOP";
-	public static final String SISTER_DEL = ",";
+	public static final String SISTER_DEL = "/";
 	public static final String NO_NODE_SYM = "-";
 	public static final String PARENT_DEL = "@";
 	public static final String ARTIFICIAL_MARKER = "@";

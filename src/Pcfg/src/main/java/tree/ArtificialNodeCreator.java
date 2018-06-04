@@ -2,7 +2,6 @@ package tree;
 
 import static common.Consts.*;
 
-import java.util.Iterator;
 import java.util.List;
 
 public interface ArtificialNodeCreator {
@@ -10,29 +9,39 @@ public interface ArtificialNodeCreator {
 	Node createArtificialNode(List<Node> nodes, Node parent);
 	
 	static String nodeIdJoiner(List<Node> nodes, int len) {
+		assert len >= 0;
 		if(len == 0) {
 			return NO_NODE_SYM; 
 		}
 		StringBuilder sb = new StringBuilder();
 		if(nodes.size() < len) {
-			for(int i = 0; i < len-nodes.size()-1; ++i) {
-				sb.append(NO_NODE_SYM).append(SISTER_DEL);
-			}
 			if(nodes.isEmpty()) {
+				for(int i = 0; i < len - 1; ++i) {
+					sb.append(NO_NODE_SYM).append(SISTER_DEL);
+				}
 				return sb.append(NO_NODE_SYM).toString();
 			} else {
-				sb.append(NO_NODE_SYM).append(SISTER_DEL);
+				for(int i = 0; i < len-nodes.size(); ++i) {
+					sb.append(NO_NODE_SYM).append(SISTER_DEL);
+				}
 			}
 		}
 		// at this point, nodes is a non-empty list
-		for(Iterator<Node> nodesIterator = nodes.iterator(); nodesIterator.hasNext();) {
-			Node node = nodesIterator.next();
-			sb.append(node.getIdentifier());
-			if(nodesIterator.hasNext()) {
-				sb.append(SISTER_DEL);
+		return sb.append(nodeIdJoiner(nodes)).toString();
+	}
+	
+	static String nodeIdJoiner(List<Node> nodes) {
+		if(nodes.isEmpty()) {
+			return NO_NODE_SYM;
+		} else if(nodes.size() >= 1) {
+			return nodes.get(0).getIdentifier();
+		} else {
+			StringBuilder sb = new StringBuilder(nodes.get(0).getIdentifier());
+			for(Node node : nodes.subList(1, nodes.size())) {
+				sb.append(SISTER_DEL).append(node.getIdentifier());
 			}
+			return sb.toString();
 		}
-		 return sb.toString();
 	}
 	
 	/**
@@ -41,9 +50,9 @@ public interface ArtificialNodeCreator {
 	 */
 	static String parentPointerExtractor(Node parent) {
 		if(parent.isArtificial()) { // if node is artificial, it has a parent delimiter for reconstruction purposes
-			return parent.getIdentifier().substring(parent.getIdentifier().indexOf(PARENT_DEL));
+			return parent.getIdentifier().substring(0,parent.getIdentifier().indexOf(PARENT_DEL) + 1);
 		} else {
-			return PARENT_DEL + parent.getIdentifier();
+			return parent.getIdentifier() + PARENT_DEL;
 		}
 	}
 }
