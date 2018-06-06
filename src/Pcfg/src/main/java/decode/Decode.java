@@ -28,14 +28,13 @@ public class Decode {
 
 	private static final Logger LOGGER = Logger.getLogger(Decode.class.getName());
 
+	public static boolean parentEncoding = true;
 	public static Set<String> m_setStartSymbols = null;
 	public static Set<Rule> m_setGrammarRules = null;
 	public static Map<String, Set<Rule>> m_mapLexicalRules = null;
 
 	public static Map<String, Set<Rule>> m_mapUnaryGrammarIndex = null; // IndexedByRhs
 	public static Map<String, Set<Rule>> m_mapBinaryGrammarIndex = null; // IndexedByRhsLeftSymbol
-	public static String defaultUnk = null;
-	public static String defaultUnkParent = null;
 	public static Double defaultUnkLogProb = null;
 
 	/**
@@ -64,10 +63,8 @@ public class Decode {
 				index.get(rhsLeftSymbol).add(rule);
 			}
 
-			defaultUnk = m_mapLexicalRules.containsKey(UNK) ? UNK : UNK + PARENT_ENCODING + DEFAULT_SYM + PARENT_ENCODING;
-			for(Rule rule : m_mapLexicalRules.get(defaultUnk)) { // TODO : look for default symbol or for maximal / minimal probability? 
+			for(Rule rule : m_mapLexicalRules.get(UNK)) { // TODO : look for default symbol or for maximal / minimal probability? 
 				if(DEFAULT_SYM.equals(rule.getLHS().getSymbols().get(0))) {
-					defaultUnkParent = rule.getLHS().getSymbols().get(0);
 					defaultUnkLogProb = rule.getMinusLogProb();
 					break;
 				}
@@ -109,8 +106,8 @@ public class Decode {
 			String word = input.get(j - 1);
 			Set<Rule> wordLexicalRules = m_mapLexicalRules.get(word);
 			if (wordLexicalRules == null) {
-				cyk.set(j-1, j, defaultUnk, defaultUnkLogProb);
-				cyk.setBackTrace(j-1, j, defaultUnkParent, -1, word, null);
+				cyk.set(j-1, j, DEFAULT_SYM, defaultUnkLogProb);
+				cyk.setBackTrace(j-1, j, DEFAULT_SYM, -1, word, null);
 			} else {
 				// run through lexical rules for each word
 				for (Rule rule : wordLexicalRules) {

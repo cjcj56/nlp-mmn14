@@ -44,7 +44,7 @@ public class Parse {
 	
 	public static int numOfThreads = 20;
 	public static int h = 1;
-	public static boolean parentEncoding = true;
+	public static boolean parentEncoding = false;
 	public static boolean multithreaded = true;
 	public static boolean trainOnGold = false; // for debugging, runs much faster
 
@@ -140,7 +140,7 @@ public class Parse {
 		writeParseTrees("parseDeBinarizing_h" + h + "_pe" + (parentEncoding ? 1 : 0), parsedTreebank.getAnalyses());
 
 		// 6. write output
-		writeOutput(args[2]+"_"+h + "_pe" + (parentEncoding ? 1 : 0), grammar, parsedTreebank.getAnalyses());
+		writeOutput(args[2]+"_h"+h + "_pe" + (parentEncoding ? 1 : 0), grammar, parsedTreebank.getAnalyses());
 	}
 	
 	
