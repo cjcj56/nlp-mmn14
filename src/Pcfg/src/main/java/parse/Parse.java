@@ -89,7 +89,7 @@ public class Parse {
 		Parse.writeParseTrees("TrainWithSmooting", trainTreebank.getAnalyses());
 //		trainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(trainTreebank, h);
 		TrainCalculateProbs.getInstance().toCnf(trainTreebank, h);
-		writeParseTrees("TrainBinarizing_h" + h, trainTreebank.getAnalyses());
+		writeParseTrees("TrainBinarizing_h" + h + "_pe" + (parentEncoding ? 1 : 0), trainTreebank.getAnalyses());
 
 		// 3. train
 		LOGGER.info("training");
@@ -134,13 +134,13 @@ public class Parse {
 		parsedTreebank = ParentEncoding.getInstance().unSmooting(parsedTreebank);
 
 		// 5. de-transform trees
-		writeParseTrees("parseBinarizing_h" + h, parsedTreebank.getAnalyses());
+		writeParseTrees("parseBinarizing_h" + h + "_pe" + (parentEncoding ? 1 : 0), parsedTreebank.getAnalyses());
 //		parsedTreebank = TrainCalculateProbs.getInstance().deTransformTreebank(parsedTreebank);
 		TrainCalculateProbs.getInstance().deCnf(parsedTreebank);
-		writeParseTrees("parseDeBinarizing_h" + h, parsedTreebank.getAnalyses());
+		writeParseTrees("parseDeBinarizing_h" + h + "_pe" + (parentEncoding ? 1 : 0), parsedTreebank.getAnalyses());
 
 		// 6. write output
-		writeOutput(args[2]+"_"+h, grammar, parsedTreebank.getAnalyses());
+		writeOutput(args[2]+"_"+h + "_pe" + (parentEncoding ? 1 : 0), grammar, parsedTreebank.getAnalyses());
 	}
 	
 	
