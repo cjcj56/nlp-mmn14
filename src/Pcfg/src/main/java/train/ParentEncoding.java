@@ -3,7 +3,6 @@ package train;
 import static common.Consts.PARENT_ENCODING;
 
 import tree.Node;
-import tree.Terminal;
 import tree.Tree;
 import treebank.Treebank;
 
@@ -37,9 +36,6 @@ public class ParentEncoding {
     private void addFatherForChild(List<Node> nodes) {
         for (int i = nodes.size() - 1; i > 0; i--) { // nodes.get(0) == root nodes
             Node node = nodes.get(i);
-            /*if(node instanceof Terminal) {
-            	continue;
-            }*/
             Node parent = node.getParent();
             if (parent != null) {
                 node.setIdentifier(new StringBuilder(node.getIdentifier()).append(PARENT_ENCODING)
@@ -57,8 +53,9 @@ public class ParentEncoding {
 
     private void subFatherForChild(List<Node> nodes) {
         for (Node nd : nodes) { // nodes.get(0) == root nodes
-            if(nd.getIdentifier().contains(PARENT_ENCODING)) {
-                nd.setIdentifier(nd.getIdentifier().substring(0, nd.getIdentifier().indexOf(PARENT_ENCODING)));
+        	String ndId = nd.getIdentifier();
+            if(ndId.contains(PARENT_ENCODING)) {
+                nd.setIdentifier(ndId.substring(0, ndId.indexOf(PARENT_ENCODING)));
             }
         }
     }

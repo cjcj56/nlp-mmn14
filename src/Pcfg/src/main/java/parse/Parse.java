@@ -1,6 +1,8 @@
 package parse;
 
 
+import static common.Consts.INFREQUENT_WORD_THRESH;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,6 +44,7 @@ public class Parse {
 	
 	public static int numOfThreads = 20;
 	public static int h = 1;
+	public static boolean parentEncoding = true;
 	public static boolean multithreaded = true;
 	public static boolean trainOnGold = false; // for debugging, runs much faster
 
@@ -67,6 +70,7 @@ public class Parse {
 		
 		// 1. read input
 		LOGGER.fine("args: " + Arrays.toString(args));
+		LOGGER.fine(String.format("additional run args: numOfThreads=%d, h=%d, multithreaded=%b", numOfThreads, h, multithreaded));
 		LOGGER.info("reading gold treebank");
 		Treebank goldTreebank = TreebankReader.getInstance().read(true, args[0]);
 		LOGGER.info("finished reading gold treebank");
@@ -75,10 +79,17 @@ public class Parse {
 		LOGGER.info("finished reading train treebank");
 
 		// 2. transform trees
-		LOGGER.info("transforming to CNF");
+		LOGGER.info("preprocessing input");
+		LOGGER.fine("smoothing infrequent words");
+		TrainCalculateProbs.getInstance().smoothInfrequentWords(trainTreebank, INFREQUENT_WORD_THRESH);
+		if(parentEncoding) {
+			LOGGER.fine("adding parent encoding");
+			trainTreebank = ParentEncoding.getInstance().smooting(trainTreebank);
+		}
+		Parse.writeParseTrees("TrainWithSmooting", trainTreebank.getAnalyses());
 //		trainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(trainTreebank, h);
 		TrainCalculateProbs.getInstance().toCnf(trainTreebank, h);
-		writeParseTrees("TrainBinarizing", trainTreebank.getAnalyses());
+		writeParseTrees("TrainBinarizing_h" + h, trainTreebank.getAnalyses());
 
 		// 3. train
 		LOGGER.info("training");
@@ -120,13 +131,13 @@ public class Parse {
 		Treebank parsedTreebank = new Treebank(parsedTrees);
 
 		//4.5. unSmooting parent
-//		parsedTreebank = ParentEncoding.getInstance().unSmooting(parsedTreebank);
+		parsedTreebank = ParentEncoding.getInstance().unSmooting(parsedTreebank);
 
 		// 5. de-transform trees
-		writeParseTrees("parseBinarizing", parsedTreebank.getAnalyses());
+		writeParseTrees("parseBinarizing_h" + h, parsedTreebank.getAnalyses());
 //		parsedTreebank = TrainCalculateProbs.getInstance().deTransformTreebank(parsedTreebank);
 		TrainCalculateProbs.getInstance().deCnf(parsedTreebank);
-		writeParseTrees("parseDeBinarizing", parsedTreebank.getAnalyses());
+		writeParseTrees("parseDeBinarizing_h" + h, parsedTreebank.getAnalyses());
 
 		// 6. write output
 		writeOutput(args[2]+"_"+h, grammar, parsedTreebank.getAnalyses());
@@ -153,9 +164,9 @@ public class Parse {
 			Grammar myGrammar,
 			List<Tree> myTrees) {
 		
-		writeParseTrees(sExperimentName, myTrees);
-		writeGrammarRules(sExperimentName, myGrammar);
-		writeLexicalEntries(sExperimentName, myGrammar);
+		writeParseTrees(sExperimentName + "_h" + h, myTrees);
+		writeGrammarRules(sExperimentName + "_h" + h, myGrammar);
+		writeLexicalEntries(sExperimentName + "_h" + h, myGrammar);
 	}
 
 	/**

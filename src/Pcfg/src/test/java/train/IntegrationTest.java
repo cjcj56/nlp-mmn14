@@ -9,11 +9,13 @@ public class IntegrationTest extends AbstractTest {
 
 	@Test
 	public void integrationTest() {
-		String[] args = {"../data/heb-ctrees.gold", "../data/heb-ctrees.train", "../../exps/test"};
-		Parse.h = 1;
-		Parse.multithreaded = true;
-		Parse.numOfThreads = 20;
-		Parse.main(args);
+		for(int h = -1; h < 3; ++h) {
+			String[] args = {"../data/heb-ctrees.gold", "../data/heb-ctrees.train", "../../exps/test"};
+			Parse.h = h;
+			Parse.multithreaded = true;
+			Parse.numOfThreads = 20;
+			Parse.main(args);
+		}
 	}
 
 }

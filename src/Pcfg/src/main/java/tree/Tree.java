@@ -1,8 +1,6 @@
 package tree;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -95,8 +93,8 @@ public class Tree {
 				node.setDaughters(new ArrayList<>());
 				node.addDaughter(daughters.get(0));
 				node.addDaughter(newDaughter);
-			}
-			if(daughters.size() == 2) { // at this point, there are either 1 or 2 daughters
+				toCnf(newDaughter, artificialNodeCreator);
+			} else if(node.getDaughters().size() == 2) { 
 				toCnf(daughters.get(1), artificialNodeCreator);
 			}
 		}

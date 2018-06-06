@@ -304,6 +304,9 @@ public class Node {
     
     public void setDaughters(List<Node> daughters) {
     	this.m_lstDaughters = daughters;
+    	for(Node daughter : daughters) {
+    		daughter.setParent(this);
+    	}
     }
     
     public void setSisters(List<Node> sisters) {

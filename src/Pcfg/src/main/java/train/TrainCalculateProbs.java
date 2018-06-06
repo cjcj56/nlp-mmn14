@@ -1,6 +1,5 @@
 package train;
 
-import static common.Consts.INFREQUENT_WORD_THRESH;
 import static common.Consts.UNK;
 
 import java.util.HashSet;
@@ -10,7 +9,6 @@ import java.util.logging.Logger;
 
 import grammar.Grammar;
 import grammar.Rule;
-import parse.Parse;
 import tree.ArtificialNodeCreator;
 import tree.Node;
 import tree.SimpleAritificialNodeCreator;
@@ -19,7 +17,6 @@ import tree.Tree;
 import treebank.Treebank;
 import utils.CountMap;
 
-import java.util.List;
 
 /**
  * @author Binyamin Kisch
@@ -48,7 +45,6 @@ public class TrainCalculateProbs extends Train {
     }
 
     public Grammar train(Treebank treebank) {
-        preProcess(treebank);
         
         Grammar grammar = super.train(treebank);
 
@@ -62,19 +58,7 @@ public class TrainCalculateProbs extends Train {
         return grammar;
     }
 
-    private void preProcess(Treebank treebank) {
-    	LOGGER.fine("preprocessing input");
-//        smoothInfrequentWords(treebank);
-//        treebank = ParentEncoding.getInstance().smooting(treebank);
-//		Parse.writeParseTrees("TrainBinarizingWithSmooting", treebank.getAnalyses());
-
-    }
-    
-    private void smoothInfrequentWords(Treebank treebank) {
-    	smoothInfrequentWords(treebank, INFREQUENT_WORD_THRESH);
-    }
-    
-	private void smoothInfrequentWords(Treebank treebank, int infrequentWordThresh) {
+	public void smoothInfrequentWords(Treebank treebank, int infrequentWordThresh) {
 		LOGGER.fine("smoothing infrequent words");
 		
 		LOGGER.finer("counting words in input");

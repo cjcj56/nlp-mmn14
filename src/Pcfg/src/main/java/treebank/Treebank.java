@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import common.Triplet;
 import tree.ArtificialNodeCreator;
 import tree.SimpleAritificialNodeCreator;
 import tree.Tree;
@@ -18,7 +17,7 @@ import tree.Tree;
  * 
  * Definition: A collection of hand-annotated corpus of NL utterances with syntactic parse trees
  * Role: Know the kind of utterance/analysis to store
- * Responsibility: Handle tree-transfrorms over the treebank, cross-compare treebanks size/trees
+ * Responsibility: Handle tree-transforms over the treebank, cross-compare treebanks size/trees
  */
 public class Treebank {
 
