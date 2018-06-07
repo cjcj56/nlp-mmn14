@@ -1,11 +1,18 @@
 
-
-evalb/evalb\.exe
-
-reports/~\$ntence10\.docx
-
-*.lnk
-
-exps/
+
+evalb/evalb\.exe
+
+reports/~\$ntence10\.docx
+
+*.lnk
+
+exps/
+
+*.parsed
 
 *.parsed
+
+*.evalC
+
+evalb/sample/
+evalb/

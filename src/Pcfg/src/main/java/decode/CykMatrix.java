@@ -103,17 +103,19 @@ public class CykMatrix {
 		if(startSymbol == null) {
 			return null;
 		}
-		
-		Triplet<Integer, Integer, String> rootTriplet = new Triplet<>(0, n, startSymbol);
+
+//		Triplet<Integer, Integer, String> rootTriplet = new Triplet<Integer, Integer, String>(0, n-1, TOP);
+
+		Triplet<Integer, Integer, String> rootTriplet = new Triplet<>(0, n, TOP);
 		
 		Node rootNode = new Node(TOP);
 		rootNode.setRoot(true);
 		
 		Tree t = new Tree(rootNode);
 		
-		Node childNode = new Node(startSymbol);
-		rootNode.addDaughter(childNode);
-		buildChild(childNode, rootTriplet);
+//		Node childNode = new Node(startSymbol);
+//		rootNode.addDaughter(childNode);
+		buildChild(rootNode, rootTriplet);
 		
 		return t;
 	}
