@@ -39,11 +39,11 @@ public class Parse {
 	 */
 	
 	private static Logger LOGGER;
-//	public static final String LOG_CONF = "./src/Pcfg/conf/logging.properties";
-	public static final String LOG_CONF = "./conf/logging.properties";
+	public static final String LOG_CONF = "./src/Pcfg/conf/logging.properties";
+//	public static final String LOG_CONF = "./conf/logging.properties";
 	
 	public static int numOfThreads = 20;
-	public static int h = 1;
+	public static int h = 2;
 	public static boolean parentEncoding = false;
 	public static boolean multithreaded = true;
 	public static boolean trainOnGold = false; // for debugging, runs much faster
@@ -85,8 +85,8 @@ public class Parse {
 		if(parentEncoding) {
 			LOGGER.fine("adding parent encoding");
 			trainTreebank = ParentEncoding.getInstance().smooting(trainTreebank);
+			Parse.writeParseTrees("TrainWithSmooting", trainTreebank.getAnalyses());
 		}
-		Parse.writeParseTrees("TrainWithSmooting", trainTreebank.getAnalyses());
 //		trainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(trainTreebank, h);
 		TrainCalculateProbs.getInstance().toCnf(trainTreebank, h);
 		writeParseTrees("TrainBinarizing_h" + h + "_pe" + (parentEncoding ? 1 : 0), trainTreebank.getAnalyses());
@@ -131,7 +131,9 @@ public class Parse {
 		Treebank parsedTreebank = new Treebank(parsedTrees);
 
 		//4.5. unSmooting parent
-		parsedTreebank = ParentEncoding.getInstance().unSmooting(parsedTreebank);
+		if(parentEncoding) {
+			parsedTreebank = ParentEncoding.getInstance().unSmooting(parsedTreebank);
+		}
 
 		// 5. de-transform trees
 		writeParseTrees("parseBinarizing_h" + h + "_pe" + (parentEncoding ? 1 : 0), parsedTreebank.getAnalyses());
