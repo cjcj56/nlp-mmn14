@@ -71,7 +71,7 @@ public class Train {
 		List<Node> myNodes = myTree.getNodes();
 		for (int j = 0; j < myNodes.size(); j++) {
 			Node myNode = myNodes.get(j);
-			if (myNode.isInternal())
+			if (!myNode.isLeaf())
 			{
 				Event eLHS = new Event(myNode.getIdentifier());
 				Iterator<Node> theDaughters = myNode.getDaughters().iterator();
@@ -89,7 +89,7 @@ public class Train {
 				if (myNode.isRoot())
 					theRule.setTop(true);
 				theRules.add(theRule);
-			}	
+			}
 		}
 		return theRules;
 	}
