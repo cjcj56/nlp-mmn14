@@ -33,7 +33,7 @@ public interface ArtificialNodeCreator {
 	static String nodeIdJoiner(List<Node> nodes) {
 		if(nodes.isEmpty()) {
 			return NO_NODE_SYM;
-		} else if(nodes.size() >= 1) {
+		} else if(nodes.size() == 1) {
 			return nodes.get(0).getIdentifier();
 		} else {
 			StringBuilder sb = new StringBuilder(nodes.get(0).getIdentifier());

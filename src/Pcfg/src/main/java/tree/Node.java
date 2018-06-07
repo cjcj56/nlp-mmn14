@@ -325,6 +325,10 @@ public class Node {
     	return this.m_lstBrothers;
     }
     
+    public boolean hasSisters() {
+        return ! getSisters().isEmpty();
+    }
+    
     public boolean isArtificial() {
     	return getIdentifier().contains(ARTIFICIAL_MARKER);
     }
