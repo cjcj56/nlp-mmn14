@@ -70,7 +70,7 @@ public class Parse {
 		
 		// 1. read input
 		LOGGER.fine("args: " + Arrays.toString(args));
-		LOGGER.fine(String.format("additional run args: numOfThreads=%d, h=%d, multithreaded=%b", numOfThreads, h, multithreaded));
+		LOGGER.fine(String.format("additional run args: numOfThreads=%d, h=%d, parentEncoding=%b, multithreaded=%b", numOfThreads, h, parentEncoding, multithreaded));
 		LOGGER.info("reading gold treebank");
 		Treebank goldTreebank = TreebankReader.getInstance().read(true, args[0]);
 		LOGGER.info("finished reading gold treebank");
