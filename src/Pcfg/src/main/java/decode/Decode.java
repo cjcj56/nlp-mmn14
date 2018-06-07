@@ -137,13 +137,10 @@ public class Decode {
 							String c = null; // rhsRightSymbol
 							probChangesHolder.put(a, computedProb); // TODO BUG ALERT!!! if a appears in lexical and grammar rule, grammar overrides lexical and deletes words from backtrace!
 							backtraceChangesHolder.put(new Triplet<>(j - 1, j, a), new Triplet<>(-2, b, c));
-//							cyk.set(j - 1, j, a, computedProb);
-							// cyk.setBackTrace(j - 1, j, a, -1, b, c);
 							foundAppropriateRule = true;
 						}
 					}
 				}
-				matrixCellProbs.putAll(matrixCellProbs);
 				cyk.putAllProbs(j-1, j, probChangesHolder);
 				cyk.putAllBacktraces(backtraceChangesHolder);
 			}
@@ -200,8 +197,6 @@ public class Decode {
 								String b = rule.getRHS().getSymbols().get(0); // rhsLeftSymbol
 								probChangesHolder.put(a, computedProb);
 								backtraceChangesHolder.put(new Triplet<>(i, j, a), new Triplet<>(-2, b, null));
-								// cyk.set(i, j, a, computedProb);
-								// cyk.setBackTrace(i, j, a, k, b, c);
 								foundAppropriateRule = true;
 							}
 						}

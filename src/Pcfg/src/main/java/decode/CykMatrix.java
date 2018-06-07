@@ -90,7 +90,7 @@ public class CykMatrix {
 			return null;
 		}
 		
-		String startSymbol = null;
+		/*String startSymbol = null;
 		Double prob = POSITIVE_INFINITY;
 		for (Map.Entry<String, Double> startSymbolProb : startSymbolProbMap.entrySet()) {
 			if(startSymbols.contains(startSymbolProb.getKey())) {
@@ -102,19 +102,17 @@ public class CykMatrix {
 		}
 		if(startSymbol == null) {
 			return null;
-		}
-
-//		Triplet<Integer, Integer, String> rootTriplet = new Triplet<Integer, Integer, String>(0, n-1, TOP);
+		}*/
 
 		Triplet<Integer, Integer, String> rootTriplet = new Triplet<>(0, n, TOP);
+		if(!backTrace.containsKey(rootTriplet)) {
+			return null;
+		}
 		
 		Node rootNode = new Node(TOP);
 		rootNode.setRoot(true);
-		
 		Tree t = new Tree(rootNode);
 		
-//		Node childNode = new Node(startSymbol);
-//		rootNode.addDaughter(childNode);
 		buildChild(rootNode, rootTriplet);
 		
 		return t;
