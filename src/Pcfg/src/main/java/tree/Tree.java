@@ -86,14 +86,27 @@ public class Tree {
 		 */
 		List<Node> daughters = node.getDaughters(); // initialized at creation time, assuming never null
 		if (!daughters.isEmpty()) {
-			toCnf(daughters.get(0), artificialNodeCreator);
+			Node firstDaughter = daughters.get(0);
+			toCnf(firstDaughter, artificialNodeCreator);
 			if (daughters.size() > 2) {
-				List<Node> redundantDaugthers = new ArrayList<>(daughters.subList(1, daughters.size()));
-				Node newDaughter = artificialNodeCreator.createArtificialNode(redundantDaugthers, node);
+				Node secondDuaghter = daughters.get(1);
+				if(!secondDuaghter.hasSisters()) {
+					for(int i = 1; i < daughters.size(); ++i) {
+						daughters.get(i).getSisters().addAll(daughters.subList(0, i));
+					}
+					/*for(int i = 0; i < daughters.size(); ++i) {
+						Node sister = daughters.get(i);
+						for(int j = i+1; j < daughters.size(); ++j) {
+							daughters.get(j).addSister(sister);
+						}
+					}*/
+				}
+				Node artificialDaughter = artificialNodeCreator.createArtificialNode(secondDuaghter.getSisters(), node);
+				artificialDaughter.addDaughters(daughters.subList(1, daughters.size()));
 				node.setDaughters(new ArrayList<>());
-				node.addDaughter(daughters.get(0));
-				node.addDaughter(newDaughter);
-				toCnf(newDaughter, artificialNodeCreator);
+				node.addDaughter(firstDaughter);
+				node.addDaughter(artificialDaughter);
+				toCnf(artificialDaughter, artificialNodeCreator);
 			} else if(node.getDaughters().size() == 2) { 
 				toCnf(daughters.get(1), artificialNodeCreator);
 			}

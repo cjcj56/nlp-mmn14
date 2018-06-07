@@ -1,7 +1,6 @@
 package decode;
 
 import static common.Consts.DEFAULT_SYM;
-import static common.Consts.PARENT_ENCODING;
 import static common.Consts.UNK;
 import static common.Consts.MAX_ITERATIONS_FOR_UNIT_RULES;
 import static java.lang.Double.POSITIVE_INFINITY;
