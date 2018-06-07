@@ -164,9 +164,9 @@ public class Parse {
 			Grammar myGrammar,
 			List<Tree> myTrees) {
 		
-		writeParseTrees(sExperimentName + "_h" + h, myTrees);
-		writeGrammarRules(sExperimentName + "_h" + h, myGrammar);
-		writeLexicalEntries(sExperimentName + "_h" + h, myGrammar);
+		writeParseTrees(sExperimentName, myTrees);
+		writeGrammarRules(sExperimentName, myGrammar);
+		writeLexicalEntries(sExperimentName, myGrammar);
 	}
 
 	/**
