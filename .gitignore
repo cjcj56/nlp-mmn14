@@ -7,3 +7,5 @@ reports/~\$ntence10\.docx
 *.lnk
 
 exps/
+
+*.parsed
