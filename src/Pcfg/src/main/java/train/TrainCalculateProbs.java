@@ -78,13 +78,16 @@ public class TrainCalculateProbs extends Train {
         }
 
         LOGGER.finer("transforming infrequent words of input to " + UNK);
+        int counter = 0;
         for (Tree tree : treebank.getAnalyses()) {
             for (Terminal terminal : tree.getTerminals()) {
                 if (infrequentWords.contains(terminal.getIdentifier())) {
                     terminal.setIdentifier(UNK);
+                    ++counter;
                 }
             }
         }
+        LOGGER.finer(String.format("Number of infrequent words changed to UNK: %d", counter));
     }
 
     public double calculateRuleProbs(Grammar grammar, Rule rule) {
