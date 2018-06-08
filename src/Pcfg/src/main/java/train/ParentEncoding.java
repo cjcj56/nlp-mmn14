@@ -37,7 +37,7 @@ public class ParentEncoding {
 	private void addFatherForChild(List<Node> nodes) {
 		for (int i = nodes.size() - 1; i > 0; i--) { // nodes.get(0) == root node
 			Node node = nodes.get(i);
-			if (! (node instanceof Terminal)) {
+			if (node.isInternal()) {
 				Node parent = node.getParent();
 				if (parent != null) {
 					node.setIdentifier(new StringBuilder(node.getIdentifier()).append(PARENT_ENCODING)

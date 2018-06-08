@@ -154,4 +154,17 @@ public class CykMatrix {
 		return triplet.a == -2;
 	}
 	
+	public Set<Triplet<Integer,Integer,String>> matchTriplets(Triplet<Integer, Integer, String> triplet) {
+		Set<Triplet<Integer,Integer,String>> matchingTriplets = new HashSet<>();
+		boolean aNull = triplet.a == null;
+		boolean bNull = triplet.b == null;
+		boolean cNull = triplet.c == null;
+		for (Triplet<Integer, Integer, String> keyTriplet : backTrace.keySet()) {
+			if((aNull || triplet.a.equals(keyTriplet.a)) && (bNull || triplet.b.equals(keyTriplet.b)) && (cNull || triplet.c.equals(keyTriplet.c))) {
+				matchingTriplets.add(keyTriplet);
+			}
+		}
+		return matchingTriplets;
+	}
+	
 }
