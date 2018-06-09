@@ -27,7 +27,6 @@ public class Decode {
 
 	private static final Logger LOGGER = Logger.getLogger(Decode.class.getName());
 
-	public static boolean parentEncoding = true;
 	public static Set<String> m_setStartSymbols = null;
 	public static Set<Rule> m_setGrammarRules = null;
 	public static Map<String, Set<Rule>> m_mapLexicalRules = null;

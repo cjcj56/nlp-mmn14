@@ -39,7 +39,7 @@ public class ParentEncoding {
 			Node node = nodes.get(i);
 			if (node.isInternal()) {
 				Node parent = node.getParent();
-				if (parent != null) {
+				if (parent != null && !parent.getIdentifier().contains("TOP")) {
 					node.setIdentifier(new StringBuilder(node.getIdentifier()).append(PARENT_ENCODING)
 							.append(parent.getIdentifier()).append(PARENT_ENCODING).toString());
 				}

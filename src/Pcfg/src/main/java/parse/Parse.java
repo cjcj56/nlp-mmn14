@@ -82,14 +82,14 @@ public class Parse {
 		LOGGER.info("preprocessing input");
 		LOGGER.fine("smoothing infrequent words");
 		TrainCalculateProbs.getInstance().smoothInfrequentWords(trainTreebank, INFREQUENT_WORD_THRESH);
+//		trainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(trainTreebank, h);
+		TrainCalculateProbs.getInstance().toCnf(trainTreebank, h);
+		writeParseTrees("TrainBinarizing_h" + h + "_pe" + (parentEncoding ? 1 : 0), trainTreebank.getAnalyses());
 		if(parentEncoding) {
 			LOGGER.fine("adding parent encoding");
 			trainTreebank = ParentEncoding.getInstance().smooting(trainTreebank);
 			Parse.writeParseTrees("TrainWithSmooting", trainTreebank.getAnalyses());
 		}
-//		trainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(trainTreebank, h);
-		TrainCalculateProbs.getInstance().toCnf(trainTreebank, h);
-		writeParseTrees("TrainBinarizing_h" + h + "_pe" + (parentEncoding ? 1 : 0), trainTreebank.getAnalyses());
 
 		// 3. train
 		LOGGER.info("training");
