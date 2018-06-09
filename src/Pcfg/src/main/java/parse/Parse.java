@@ -44,7 +44,7 @@ public class Parse {
 	
 	public static int numOfThreads = 20;
 	public static int h = 2;
-	public static boolean parentEncoding = false;
+	public static boolean parentEncoding = true;
 	public static boolean multithreaded = true;
 	public static boolean trainOnGold = false; // for debugging, runs much faster
 
@@ -83,13 +83,13 @@ public class Parse {
 		LOGGER.fine("smoothing infrequent words");
 		TrainCalculateProbs.getInstance().smoothInfrequentWords(trainTreebank, INFREQUENT_WORD_THRESH);
 //		trainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(trainTreebank, h);
-		TrainCalculateProbs.getInstance().toCnf(trainTreebank, h);
-		writeParseTrees("TrainBinarizing_h" + h + "_pe" + (parentEncoding ? 1 : 0), trainTreebank.getAnalyses());
 		if(parentEncoding) {
 			LOGGER.fine("adding parent encoding");
 			trainTreebank = ParentEncoding.getInstance().smooting(trainTreebank);
 			Parse.writeParseTrees("TrainWithSmooting", trainTreebank.getAnalyses());
 		}
+		TrainCalculateProbs.getInstance().toCnf(trainTreebank, h);
+		writeParseTrees("TrainBinarizing_h" + h + "_pe" + (parentEncoding ? 1 : 0), trainTreebank.getAnalyses());
 
 		// 3. train
 		LOGGER.info("training");
