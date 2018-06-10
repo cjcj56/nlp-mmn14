@@ -31,7 +31,6 @@ public class Grammar {
 	protected CountMap<Rule> m_cmRuleCounts = new CountMap<Rule>();
 	protected Map<String, Set<Rule>> m_lexLexicalEntries = new HashMap<String, Set<Rule>>();
 
-	// aviad
 	protected CountMap<String> m_cmNonTerminalSymbolsCounts = new CountMap<String>();
 
 
@@ -159,7 +158,6 @@ public class Grammar {
 		}
 	}
 
-	//aviad
 	public CountMap<String> getNonTerminalSymbolsCounts() {
 		return m_cmNonTerminalSymbolsCounts;
 	}

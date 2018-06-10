@@ -81,9 +81,6 @@ public class Tree {
 	}
 
 	private void toCnf(Node node, ArtificialNodeCreator artificialNodeCreator) {
-		/*
-		 * if(true) { throw new IllegalAccessError("NotImplmenented!"); }
-		 */
 		List<Node> daughters = node.getDaughters(); // initialized at creation time, assuming never null
 		if (!daughters.isEmpty()) {
 			Node firstDaughter = daughters.get(0);
@@ -94,12 +91,6 @@ public class Tree {
 					for(int i = 1; i < daughters.size(); ++i) {
 						daughters.get(i).getSisters().addAll(daughters.subList(0, i));
 					}
-					/*for(int i = 0; i < daughters.size(); ++i) {
-						Node sister = daughters.get(i);
-						for(int j = i+1; j < daughters.size(); ++j) {
-							daughters.get(j).addSister(sister);
-						}
-					}*/
 				}
 				Node artificialDaughter = artificialNodeCreator.createArtificialNode(secondDuaghter.getSisters(), node);
 				artificialDaughter.addDaughters(daughters.subList(1, daughters.size()));
@@ -118,9 +109,6 @@ public class Tree {
 	}
 
 	private void deCnf(Node node) {
-		/*
-		 * if(true) { throw new IllegalAccessError("NotImplmenented!"); }
-		 */
 		List<Node> daughters = node.getDaughters();
 		if ((daughters != null) && (!daughters.isEmpty())) {
 			if (daughters.size() > 1) {

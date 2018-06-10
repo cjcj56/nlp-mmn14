@@ -85,44 +85,6 @@ public class CykMatrix {
         this.backTrace.putAll(backTrace);
     }
 
-    //	public Tree buildTree(Set<String> startSymbols) {
-//		Map<String, Double> startSymbolProbMap = matrix.get(0).get(n-1);
-//		if(startSymbolProbMap == null) {
-//			return null;
-//		}
-//
-//		/*String startSymbol = null;
-//		Double prob = POSITIVE_INFINITY;
-//		for (Map.Entry<String, Double> startSymbolProb : startSymbolProbMap.entrySet()) {
-//			if(startSymbols.contains(startSymbolProb.getKey())) {
-//				if(startSymbolProb.getValue() < prob) {
-//					startSymbol = startSymbolProb.getKey();
-//					prob = startSymbolProb.getValue();
-//				}
-//			}
-//		}
-//		if(startSymbol == null) {
-//			return null;
-//		}*/
-//
-//		Triplet<Integer, Integer, String> rootTriplet = new Triplet<>(0, n, TOP);
-//		if(!backTrace.containsKey(rootTriplet)) {
-//			return null;
-//		}
-//
-//		Node rootNode = new Node(TOP);
-//		rootNode.setRoot(true);
-//		Tree t = new Tree(rootNode);
-//		Node childNode = new Node(startSymbol);
-//		rootNode.addDaughter(childNode);
-//		buildChild(childNode, rootTriplet);
-////    Node childNode = new Node(startSymbol);
-////    rootNode.addDaughter(childNode);
-////		buildChild(rootNode, rootTriplet)
-////		buildChild(rootNode, rootTriplet);
-//
-//		return t;
-//	}
     public Tree buildTree(Set<String> startSymbols) {
         Map<String, Double> startSymbolProbMap = matrix.get(0).get(n - 1);
         if (startSymbolProbMap.size() == 0 || startSymbolProbMap == null) {
