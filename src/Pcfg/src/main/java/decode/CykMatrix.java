@@ -70,7 +70,7 @@ public class CykMatrix {
         assertIndicesInMatrixBounds(row, realColIdx);
         return matrix.get(row).get(realColIdx).getOrDefault(symbol, POSITIVE_INFINITY);
     }
-
+    
     private void assertIndicesInMatrixBounds(int row, int col) {
         assert row >= 0 && row < matrix.size();
         assert col >= 0 && col < matrix.get(row).size();
@@ -87,7 +87,7 @@ public class CykMatrix {
 
     public Tree buildTree(Set<String> startSymbols) {
         Map<String, Double> startSymbolProbMap = matrix.get(0).get(n - 1);
-        if (startSymbolProbMap.size() == 0 || startSymbolProbMap == null) {
+        if (startSymbolProbMap.isEmpty()) {
             return null;
         }
 

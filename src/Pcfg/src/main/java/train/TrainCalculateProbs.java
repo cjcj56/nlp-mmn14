@@ -20,6 +20,7 @@ import utils.CountMap;
 
 /**
  * @author Binyamin Kisch
+ * @author Aviad Pinis
  * <p>
  * CLASS: Train
  * <p>

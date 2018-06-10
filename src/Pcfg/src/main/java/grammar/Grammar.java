@@ -82,7 +82,6 @@ public class Grammar {
 		// update the rule counts 
 		getRuleCounts().increment(r);
 
-		//aviad
 		getNonTerminalSymbolsCounts().increment(r.getLHS().getSymbols().get(0));
 
 	}

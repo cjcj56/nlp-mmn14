@@ -39,14 +39,12 @@ public class Parse {
 	 */
 	
 	private static Logger LOGGER;
-	public static final String LOG_CONF = "./src/Pcfg/conf/logging.properties";
-//	public static final String LOG_CONF = "./conf/logging.properties";
+	public static final String LOG_CONF = "./conf/logging.properties";
 	
 	public static int numOfThreads = 20;
 	public static int h = 0;
 	public static boolean parentEncoding = false;
 	public static boolean multithreaded = true;
-	public static boolean trainOnGold = false; // for debugging, runs much faster
 
 	
 	public static void main(String[] args) {
@@ -66,7 +64,6 @@ public class Parse {
 		// 0. initialize
 		initLogging(LOG_CONF);
 		LOGGER = Logger.getLogger(Parse.class.getName());
-		args[1] = trainOnGold ? args[0] : args[1];
 		
 		// 1. read input
 		LOGGER.fine("args: " + Arrays.toString(args));
@@ -85,10 +82,10 @@ public class Parse {
 		if(parentEncoding) {
 			LOGGER.fine("adding parent encoding");
 			trainTreebank = ParentEncoding.getInstance().smooting(trainTreebank);
-			Parse.writeParseTrees("TrainWithSmooting", trainTreebank.getAnalyses());
+			Parse.writeParseTrees(args[2] + "_TrainWithSmooting", trainTreebank.getAnalyses());
 		}
 		TrainCalculateProbs.getInstance().toCnf(trainTreebank, h);
-		writeParseTrees("TrainBinarizing_h" + h + "_pe" + (parentEncoding ? 1 : 0), trainTreebank.getAnalyses());
+		writeParseTrees(args[2] + "_TrainBinarizing", trainTreebank.getAnalyses());
 
 		// 3. train
 		LOGGER.info("training");
@@ -135,12 +132,12 @@ public class Parse {
 		}
 
 		// 5. de-transform trees
-		writeParseTrees("parseBinarizing_h" + h + "_pe" + (parentEncoding ? 1 : 0), parsedTreebank.getAnalyses());
+		writeParseTrees(args[2] + "_parseBinarizing", parsedTreebank.getAnalyses());
 		TrainCalculateProbs.getInstance().deCnf(parsedTreebank);
-		writeParseTrees("parseDeBinarizing_h" + h + "_pe" + (parentEncoding ? 1 : 0), parsedTreebank.getAnalyses());
+		writeParseTrees(args[2] + "_parseDeBinarizing", parsedTreebank.getAnalyses());
 
 		// 6. write output
-		writeOutput(args[2]+"_h"+h + "_pe" + (parentEncoding ? 1 : 0), grammar, parsedTreebank.getAnalyses());
+		writeOutput(args[2], grammar, parsedTreebank.getAnalyses());
 	}
 	
 	
