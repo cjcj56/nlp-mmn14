@@ -43,8 +43,8 @@ public class Parse {
 //	public static final String LOG_CONF = "./conf/logging.properties";
 	
 	public static int numOfThreads = 20;
-	public static int h = 2;
-	public static boolean parentEncoding = true;
+	public static int h = 0;
+	public static boolean parentEncoding = false;
 	public static boolean multithreaded = true;
 	public static boolean trainOnGold = false; // for debugging, runs much faster
 
@@ -82,7 +82,6 @@ public class Parse {
 		LOGGER.info("preprocessing input");
 		LOGGER.fine("smoothing infrequent words");
 		TrainCalculateProbs.getInstance().smoothInfrequentWords(trainTreebank, INFREQUENT_WORD_THRESH);
-//		trainTreebank = TrainCalculateProbs.getInstance().updateTreebankToCNF(trainTreebank, h);
 		if(parentEncoding) {
 			LOGGER.fine("adding parent encoding");
 			trainTreebank = ParentEncoding.getInstance().smooting(trainTreebank);
@@ -137,7 +136,6 @@ public class Parse {
 
 		// 5. de-transform trees
 		writeParseTrees("parseBinarizing_h" + h + "_pe" + (parentEncoding ? 1 : 0), parsedTreebank.getAnalyses());
-//		parsedTreebank = TrainCalculateProbs.getInstance().deTransformTreebank(parsedTreebank);
 		TrainCalculateProbs.getInstance().deCnf(parsedTreebank);
 		writeParseTrees("parseDeBinarizing_h" + h + "_pe" + (parentEncoding ? 1 : 0), parsedTreebank.getAnalyses());
 
